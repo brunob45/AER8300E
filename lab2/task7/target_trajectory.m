@@ -13,7 +13,7 @@ alpha = 0; % alpha is the local angle in the local trajectory axes
 
 % define the rotation matrix (constant)
 phi = 0;
-theta = pi*0.5;
+theta = pi*0.4;
 psi = 0;
 
 Rx = [1 0 0;0 cos(phi) -sin(phi); 0 sin(phi) cos(phi)];
