@@ -1,0 +1,117 @@
+package Lab3
+public
+	with Data_Model;
+
+	system Satellite
+	end Satellite;
+	
+	
+	
+	data radians
+		properties
+			Data_Model::Data_Representation => float;
+	end radians;
+	
+	data torque
+		properties
+			Data_Model::Data_Representation => float;
+	end torque;
+	
+	
+	
+	bus CommBus
+	end CommBus;
+	
+	
+	
+	device SunSensor
+		features
+			rot_x: out data port radians;
+			rot_y: out data port radians;
+			rot_z: out data port radians;
+			
+			comm: requires bus access CommBus;
+	end SunSensor;
+	
+	device Torquer
+		features
+			tor_x: in data port torque;
+			tor_y: in data port torque;
+			tor_z: in data port torque;
+			
+			comm: requires bus access CommBus;
+	end Torquer;
+
+	device Computer
+		features
+			rot_x_in: in data port radians;
+			rot_y_in: in data port radians;
+			rot_z_in: in data port radians;
+			rot_x_out: out data port radians;
+			rot_y_out: out data port radians;
+			rot_z_out: out data port radians;
+			tor_x_in: in data port torque;
+			tor_y_in: in data port torque;
+			tor_z_in: in data port torque;
+			tor_x_out: out data port torque;
+			tor_y_out: out data port torque;
+			tor_z_out: out data port torque;
+			
+			comm: requires bus access CommBus;
+	end Computer;
+	
+	
+	
+	process Controller
+		features
+			rot_x: in data port radians;
+			rot_y: in data port radians;
+			rot_z: in data port radians;
+			
+			tor_x: out data port torque;
+			tor_y: out data port torque;
+			tor_z: out data port torque;
+	end Controller;
+	
+	
+	
+	system implementation Satellite.impl
+		subcomponents
+			sens: device SunSensor;
+			act: device Torquer;
+			cpu: device Computer;
+			contr: process Controller;
+			comm: bus CommBus;
+			
+		connections
+			SnCpX: port sens.rot_x -> cpu.rot_x_in;
+			SnCpY: port sens.rot_y -> cpu.rot_y_in;
+			SnCpZ: port sens.rot_z -> cpu.rot_z_in;
+			CpCnX: port cpu.rot_x_out -> contr.rot_x;
+			CpCnY: port cpu.rot_y_out -> contr.rot_y;
+			CpCnZ: port cpu.rot_z_out -> contr.rot_z;
+			CnCpX: port contr.tor_x -> cpu.tor_x_in;
+			CnCpY: port contr.tor_y -> cpu.tor_y_in;
+			CnCpZ: port contr.tor_z -> cpu.tor_z_in;
+			CpAcX: port cpu.tor_x_out -> act.tor_x;
+			CpAcY: port cpu.tor_y_out -> act.tor_y;
+			CpAcZ: port cpu.tor_z_out -> act.tor_z;
+			
+			CommSn: bus access comm <-> sens.comm;
+			CommAc: bus access comm <-> act.comm;
+			CommCp: bus access comm <-> cpu.comm;
+	end Satellite.impl;
+	
+	
+	device implementation SunSensor.impl
+		properties
+			Period => 100ms;
+	end SunSensor.impl;
+	
+	device implementation Torquer.impl
+	end Torquer.impl;
+	
+	device implementation Computer.impl
+	end Computer.impl;
+	
+end Lab3;
