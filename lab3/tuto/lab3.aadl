@@ -31,6 +31,11 @@ public
 			rot_z: out data port radians;
 			
 			comm: requires bus access CommBus;
+			
+		flows
+			fx: flow source rot_x {latency => 1ms..2ms;};
+			fy: flow source rot_y {latency => 1ms..2ms;};
+			fz: flow source rot_z {latency => 1ms..2ms;};
 	end SunSensor;
 	
 	device Torquer
@@ -40,6 +45,11 @@ public
 			tor_z: in data port torque;
 			
 			comm: requires bus access CommBus;
+
+		flows
+			fx: flow sink tor_x {latency => 1ms .. 2ms;};
+			fy: flow sink tor_y {latency => 1ms .. 2ms;};
+			fz: flow sink tor_z {latency => 1ms .. 2ms;};				
 	end Torquer;
 
 	device Computer
@@ -71,6 +81,11 @@ public
 			tor_x: out data port torque;
 			tor_y: out data port torque;
 			tor_z: out data port torque;
+			
+		flows
+			fx: flow path rot_x -> tor_x {latency => 3ms..5ms;};
+			fy: flow path rot_y -> tor_y {latency => 3ms..5ms;};
+			fz: flow path rot_z -> tor_z {latency => 3ms..5ms;};
 	end Controller;
 	
 	
@@ -103,6 +118,7 @@ public
 	end Satellite.impl;
 	
 	
+	
 	device implementation SunSensor.impl
 		properties
 			Period => 100ms;
@@ -114,4 +130,35 @@ public
 	device implementation Computer.impl
 	end Computer.impl;
 	
+	
+	
+	thread ControlThread
+		features
+			rot_x: in data port radians;
+			rot_y: in data port radians;
+			rot_z: in data port radians;
+			
+			tor_x: out data port torque;
+			tor_y: out data port torque;
+			tor_z: out data port torque;
+	end ControlThread;
+	
+	thread implementation ControlThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end ControlThread.impl;
+	
+	process implementation Controller.impl
+		subcomponents
+			worker: thread ControlThread.impl;
+		connections
+			Rx: port rot_x -> worker.rot_x;
+			Ry: port rot_y -> worker.rot_y;
+			Rz: port rot_z -> worker.rot_z;
+			
+			Tx: port worker.tor_x -> tor_x;
+			Ty: port worker.tor_y -> tor_y;
+			Tz: port worker.tor_z -> tor_z;
+	end Controller.impl;
 end Lab3;
