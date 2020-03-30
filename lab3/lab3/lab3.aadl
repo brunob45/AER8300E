@@ -31,6 +31,9 @@ public
 	end angularRate;
 	
 	
+	
+	
+	
 	device FineSunSensor
 		features
 			rot_x: out data port radians;
@@ -44,6 +47,7 @@ public
 			fy: flow source rot_y {latency => 1ms..2ms;};
 			fz: flow source rot_z {latency => 1ms..2ms;};
 	end FineSunSensor;
+		
 	device CoarseSunSensor
 		features
 			rot_x: out data port radians;
@@ -57,6 +61,7 @@ public
 			fy: flow source rot_y {latency => 1ms..2ms;};
 			fz: flow source rot_z {latency => 1ms..2ms;};
 	end CoarseSunSensor;
+	
 	device SunPresenceSensor
 		features
 			is_present: out data port;
@@ -66,6 +71,7 @@ public
 		flows
 			fi: flow source is_present {latency => 1ms..2ms;};
 	end SunPresenceSensor;
+		
 	device EarthSensor
 		features
 			rot_x: out data port radians;
@@ -79,6 +85,7 @@ public
 			fy: flow source rot_y {latency => 1ms..2ms;};
 			fz: flow source rot_z {latency => 1ms..2ms;};
 	end EarthSensor;
+	
 	device Magnetometer
 		features
 			mag_x: out data port magneto;
@@ -92,6 +99,7 @@ public
 			fy: flow source mag_y {latency => 1ms..2ms;};
 			fz: flow source mag_z {latency => 1ms..2ms;};
 	end Magnetometer;
+		
 	device Gyroscope
 		features
 			rate_x: out data port angularRate;
@@ -105,7 +113,7 @@ public
 			fy: flow source rate_y {latency => 1ms..2ms;};
 			fz: flow source rate_z {latency => 1ms..2ms;};
 	end Gyroscope;
-	
+		
 	device GPS
 		features
 			long: out data port;
@@ -121,6 +129,7 @@ public
 			fz: flow source el {latency => 1ms..2ms;};
 			fw: flow source time {latency => 1ms..2ms;};
 	end GPS;
+		
 	device StarTracker
 		features
 			rot_x: out data port radians;
@@ -134,6 +143,9 @@ public
 			fy: flow source rot_y {latency => 1ms..2ms;};
 			fz: flow source rot_z {latency => 1ms..2ms;};
 	end StarTracker;
+		
+	
+	
 	
 	
 	device RxWheel
@@ -199,4 +211,37 @@ public
 			
 			comm: requires bus access CommBus;
 	end Computer;
+
+	device implementation FineSunSensor.impl
+		properties
+			Period => 100ms;
+	end FineSunSensor.impl;
+	device implementation CoarseSunSensor.impl
+		properties
+			Period => 100ms;
+	end CoarseSunSensor.impl;
+	device implementation SunPresenceSensor.impl
+		properties
+			Period => 1000ms;
+	end SunPresenceSensor.impl;
+	device implementation EarthSensor.impl
+		properties
+			Period => 1000ms;
+	end EarthSensor.impl;
+	device implementation Magnetometer.impl
+		properties
+			Period => 10ms;
+	end Magnetometer.impl;
+	device implementation Gyroscope.impl
+		properties
+			Period => 1ms;
+	end Gyroscope.impl;
+	device implementation GPS.impl
+		properties
+			Period => 1000ms;
+	end GPS.impl;
+	device implementation StarTracker.impl
+		properties
+			Period => 1000ms;
+	end StarTracker.impl;
 end lab3;
