@@ -149,7 +149,6 @@ public
 			fy: flow sink tor_y {latency => 1ms .. 2ms;};
 			fz: flow sink tor_z {latency => 1ms .. 2ms;};				
 	end RxWheel;
-	
 	device Thruster
 		features
 			dV_x: in data port deltaV;
@@ -163,4 +162,41 @@ public
 			fy: flow sink dV_y {latency => 1ms .. 2ms;};
 			fz: flow sink dV_z {latency => 1ms .. 2ms;};				
 	end Thruster;
+	
+	
+	device Computer
+		features
+			fss_rot_x_in: in data port radians;
+			fss_rot_y_in: in data port radians;
+			fss_rot_z_in: in data port radians;
+			css_rot_x_in: in data port radians;
+			css_rot_y_in: in data port radians;
+			css_rot_z_in: in data port radians;
+			sps_present_in: in data port;
+			es_rot_x_in: in data port radians;
+			es_rot_y_in: in data port radians;
+			es_rot_z_in: in data port radians;
+			mag_x_in: in data port magneto;
+			mag_y_in: in data port magneto;
+			mag_z_in: in data port magneto;
+			rate_x_in: in data port angularRate;
+			rate_y_in: in data port angularRate;
+			rate_z_in: in data port angularRate;
+			gps_long_in: in data port;
+			gps_lat_in: in data port;
+			gps_el_in: in data port;
+			gps_time_in: in data port;
+			st_rot_x_in: in data port radians;
+			st_rot_y_in: in data port radians;
+			st_rot_z_in: in data port radians;
+			
+			tor_x_out: out data port torque;
+			tor_y_out: out data port torque;
+			tor_z_out: out data port torque;
+			dV_x_out: out data port deltaV;
+			dV_y_out: out data port deltaV;
+			dV_z_out: out data port deltaV;
+			
+			comm: requires bus access CommBus;
+	end Computer;
 end lab3;
