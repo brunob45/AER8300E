@@ -1,0 +1,132 @@
+package lab3
+public
+	with Data_Model;
+	
+	bus CommBus
+	end CommBus;
+	
+	data radians
+		properties
+			Data_Model::Data_Representation => float;
+	end radians;
+	
+	data torque
+		properties
+			Data_Model::Data_Representation => float;
+	end torque;
+	
+	data magneto
+		properties
+			Data_Model::Data_Representation => float;
+	end magneto;
+	
+	data angularRate
+		properties
+			Data_Model::Data_Representation => float;
+	end angularRate;
+	
+	
+	device FineSunSensor
+		features
+			rot_x: out data port radians;
+			rot_y: out data port radians;
+			rot_z: out data port radians;
+			
+			comm: requires bus access CommBus;
+			
+		flows
+			fx: flow source rot_x {latency => 1ms..2ms;};
+			fy: flow source rot_y {latency => 1ms..2ms;};
+			fz: flow source rot_z {latency => 1ms..2ms;};
+	end FineSunSensor;
+	device CoarseSunSensor
+		features
+			rot_x: out data port radians;
+			rot_y: out data port radians;
+			rot_z: out data port radians;
+			
+			comm: requires bus access CommBus;
+			
+		flows
+			fx: flow source rot_x {latency => 1ms..2ms;};
+			fy: flow source rot_y {latency => 1ms..2ms;};
+			fz: flow source rot_z {latency => 1ms..2ms;};
+	end CoarseSunSensor;
+	device SunPresenceSensor
+		features
+			is_present: out data port;
+			
+			comm: requires bus access CommBus;
+			
+		flows
+			fi: flow source is_present {latency => 1ms..2ms;};
+	end SunPresenceSensor;
+	device EarthSensor
+		features
+			rot_x: out data port radians;
+			rot_y: out data port radians;
+			rot_z: out data port radians;
+			
+			comm: requires bus access CommBus;
+			
+		flows
+			fx: flow source rot_x {latency => 1ms..2ms;};
+			fy: flow source rot_y {latency => 1ms..2ms;};
+			fz: flow source rot_z {latency => 1ms..2ms;};
+	end EarthSensor;
+	device Magnetometer
+		features
+			mag_x: out data port magneto;
+			mag_y: out data port magneto;
+			mag_z: out data port magneto;
+			
+			comm: requires bus access CommBus;
+			
+		flows
+			fx: flow source mag_x {latency => 1ms..2ms;};
+			fy: flow source mag_y {latency => 1ms..2ms;};
+			fz: flow source mag_z {latency => 1ms..2ms;};
+	end Magnetometer;
+	device Gyroscope
+		features
+			rate_x: out data port angularRate;
+			rate_y: out data port angularRate;
+			rate_z: out data port angularRate;
+			
+			comm: requires bus access CommBus;
+			
+		flows
+			fx: flow source rate_x {latency => 1ms..2ms;};
+			fy: flow source rate_y {latency => 1ms..2ms;};
+			fz: flow source rate_z {latency => 1ms..2ms;};
+	end Gyroscope;
+	
+	device GPS
+		features
+			long: out data port;
+			lat: out data port;
+			el: out data port;
+			time: out data port;
+			
+			comm: requires bus access CommBus;
+			
+		flows
+			fx: flow source long {latency => 1ms..2ms;};
+			fy: flow source lat {latency => 1ms..2ms;};
+			fz: flow source el {latency => 1ms..2ms;};
+			fw: flow source time {latency => 1ms..2ms;};
+	end GPS;
+	device StarTracker
+		features
+			rot_x: out data port radians;
+			rot_y: out data port radians;
+			rot_z: out data port radians;
+			
+			comm: requires bus access CommBus;
+			
+		flows
+			fx: flow source rot_x {latency => 1ms..2ms;};
+			fy: flow source rot_y {latency => 1ms..2ms;};
+			fz: flow source rot_z {latency => 1ms..2ms;};
+	end StarTracker;
+end lab3;
