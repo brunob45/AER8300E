@@ -178,6 +178,38 @@ public
 			fz: flow sink dV_z {latency => 1ms .. 2ms;};				
 	end Thruster;
 	
+	device TeleMetry
+		features
+			rot_x: in data port radians;
+			rot_y: in data port radians;
+			rot_z: in data port radians;
+			long: in data port;
+			lat: in data port;
+			el: in data port;
+			time: in data port;
+			
+		flows
+			fx: flow sink rot_x {latency => 1ms .. 2ms;};
+			fy: flow sink rot_y {latency => 1ms .. 2ms;};
+			fz: flow sink rot_z {latency => 1ms .. 2ms;};
+			flo: flow sink long {latency => 1ms..2ms;};
+			fla: flow sink lat {latency => 1ms..2ms;};
+			fel: flow sink el {latency => 1ms..2ms;};
+			ft: flow sink time {latency => 1ms..2ms;};
+	end TeleMetry;
+	
+	device TeleCommand
+		features
+			deltaV_x: out data port;
+			deltaV_y: out data port;
+			deltaV_z: out data port;
+			
+		flows
+			fx: flow source deltaV_x {latency => 1ms .. 2ms;};
+			fy: flow source deltaV_y {latency => 1ms .. 2ms;};
+			fz: flow source deltaV_z {latency => 1ms .. 2ms;};	
+	end TeleCommand;
+	
 	
 	device AocsCpu
 		features
@@ -217,6 +249,22 @@ public
 	end AocsCpu;
 	
 	device TmTcCpu
+		features
+			deltaV_x: in data port;
+			deltaV_y: in data port;
+			deltaV_z: in data port;
+
+			rot_x: out data port radians;
+			rot_y: out data port radians;
+			rot_z: out data port radians;
+			long: out data port;
+			lat: out data port;
+			el: out data port;
+			time: out data port;
+			new_command: out event port;
+			new_meter: out event port;
+			
+			tmtc: requires bus access TmTcBus;
 	end TmTcCpu;
 
 	device implementation FineSunSensor.impl
