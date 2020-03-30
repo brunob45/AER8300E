@@ -2,8 +2,11 @@ package lab3
 public
 	with Data_Model;
 	
-	bus CommBus
-	end CommBus;
+	bus AocsBus
+	end AocsBus;
+	
+	bus TmTcBus
+	end TmTcBus;
 	
 	data radians
 		properties
@@ -40,7 +43,7 @@ public
 			rot_y: out data port radians;
 			rot_z: out data port radians;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 			
 		flows
 			fx: flow source rot_x {latency => 1ms..2ms;};
@@ -54,7 +57,7 @@ public
 			rot_y: out data port radians;
 			rot_z: out data port radians;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 			
 		flows
 			fx: flow source rot_x {latency => 1ms..2ms;};
@@ -66,7 +69,7 @@ public
 		features
 			is_present: out data port;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 			
 		flows
 			fi: flow source is_present {latency => 1ms..2ms;};
@@ -78,7 +81,7 @@ public
 			rot_y: out data port radians;
 			rot_z: out data port radians;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 			
 		flows
 			fx: flow source rot_x {latency => 1ms..2ms;};
@@ -92,7 +95,7 @@ public
 			mag_y: out data port magneto;
 			mag_z: out data port magneto;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 			
 		flows
 			fx: flow source mag_x {latency => 1ms..2ms;};
@@ -106,7 +109,7 @@ public
 			rate_y: out data port angularRate;
 			rate_z: out data port angularRate;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 			
 		flows
 			fx: flow source rate_x {latency => 1ms..2ms;};
@@ -121,7 +124,7 @@ public
 			el: out data port;
 			time: out data port;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 			
 		flows
 			fx: flow source long {latency => 1ms..2ms;};
@@ -136,7 +139,7 @@ public
 			rot_y: out data port radians;
 			rot_z: out data port radians;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 			
 		flows
 			fx: flow source rot_x {latency => 1ms..2ms;};
@@ -154,7 +157,7 @@ public
 			tor_y: in data port torque;
 			tor_z: in data port torque;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 
 		flows
 			fx: flow sink tor_x {latency => 1ms .. 2ms;};
@@ -167,7 +170,7 @@ public
 			dV_y: in data port deltaV;
 			dV_z: in data port deltaV;
 			
-			comm: requires bus access CommBus;
+			comm: requires bus access AocsBus;
 
 		flows
 			fx: flow sink dV_x {latency => 1ms .. 2ms;};
@@ -176,7 +179,7 @@ public
 	end Thruster;
 	
 	
-	device Computer
+	device AocsCpu
 		features
 			fss_rot_x_in: in data port radians;
 			fss_rot_y_in: in data port radians;
@@ -209,8 +212,12 @@ public
 			dV_y_out: out data port deltaV;
 			dV_z_out: out data port deltaV;
 			
-			comm: requires bus access CommBus;
-	end Computer;
+			aocs: requires bus access AocsBus;
+			tmtc: requires bus access TmTcBus;
+	end AocsCpu;
+	
+	device TmTcCpu
+	end TmTcCpu;
 
 	device implementation FineSunSensor.impl
 		properties
