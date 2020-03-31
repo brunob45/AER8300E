@@ -8,6 +8,8 @@ public
 	bus TmTcBus
 	end TmTcBus;
 	
+	-- data types needed
+	
 	data radians
 		properties
 			Data_Model::Data_Representation => float;
@@ -39,7 +41,9 @@ public
 	end sunExist;
 	
 	
+	-- -------------------------- DEVICES --------------------------------------
 	
+	-- -----------------DEVICES: SENSORS ----------------------
 	device FineSunSensor
 		features
 			fss_rot_x: out data port radians;
@@ -150,10 +154,8 @@ public
 			fz: flow source st_rot_z {latency => 1ms..2ms;};
 	end StarTracker;
 		
-	
-	
-	
-	
+		
+	-- --------------- DEVICES: ACTUATORS ------------------	
 	device RxWheel
 		features
 			tor_x: in data port torque;
@@ -181,6 +183,9 @@ public
 			fz: flow sink dV_z {latency => 1ms .. 2ms;};				
 	end Thruster;
 	
+	
+	
+	-- ---------------- DEVICES: COMPUTERS AND TELEMETRY --------------
 	device TeleMetry
 		features
 			rot_x: in data port radians;
@@ -213,10 +218,66 @@ public
 			fz: flow source deltaV_z {latency => 1ms .. 2ms;};	
 	end TeleCommand;
 	
+	device AocsCpu
+		features
+			fss_rot_x_in: in data port radians;
+			fss_rot_y_in: in data port radians;
+			fss_rot_z_in: in data port radians;
+			css_rot_x_in: in data port radians;
+			css_rot_y_in: in data port radians;
+			css_rot_z_in: in data port radians;
+			sps_present_in: in data port sunExist;
+			es_rot_x_in: in data port radians;
+			es_rot_y_in: in data port radians;
+			es_rot_z_in: in data port radians;
+			mag_x_in: in data port magneto;
+			mag_y_in: in data port magneto;
+			mag_z_in: in data port magneto;
+			rate_x_in: in data port angularRate;
+			rate_y_in: in data port angularRate;
+			rate_z_in: in data port angularRate;
+			gps_long_in: in data port;
+			gps_lat_in: in data port;
+			gps_el_in: in data port;
+			gps_time_in: in data port;
+			st_rot_x_in: in data port radians;
+			st_rot_y_in: in data port radians;
+			st_rot_z_in: in data port radians;
+			
+			tor_x_out: out data port torque;
+			tor_y_out: out data port torque;
+			tor_z_out: out data port torque;
+			dV_x_out: out data port deltaV;
+			dV_y_out: out data port deltaV;
+			dV_z_out: out data port deltaV;
+			
+			aocs: requires bus access AocsBus;
+			tmtc: requires bus access TmTcBus;
+	end AocsCpu;
+	
+	device TmTcCpu
+		features
+			deltaV_x: in data port;
+			deltaV_y: in data port;
+			deltaV_z: in data port;
+
+			rot_x: out data port radians;
+			rot_y: out data port radians;
+			rot_z: out data port radians;
+			long: out data port;
+			lat: out data port;
+			el: out data port;
+			time: out data port;
+			new_command: out event port;
+			new_meter: out event port;
+			
+			tmtc: requires bus access TmTcBus;
+	end TmTcCpu;
 	
 	
+	-- --------------------- PROCESSES AND THREADS ---------------------
 	
-	
+	-- process and threads for controlling attitude
 	process attitudeController
 		features
 			fss_rot_x: in data port radians;
@@ -290,7 +351,7 @@ public
 	
 	
 	
-	
+	-- process and thread for controlling the orbit
 	process orbitController
 		features
 			gps_long: in data port;
@@ -316,61 +377,11 @@ public
 	end orbitControlThread;
 	
 	
-	device AocsCpu
-		features
-			fss_rot_x_in: in data port radians;
-			fss_rot_y_in: in data port radians;
-			fss_rot_z_in: in data port radians;
-			css_rot_x_in: in data port radians;
-			css_rot_y_in: in data port radians;
-			css_rot_z_in: in data port radians;
-			sps_present_in: in data port sunExist;
-			es_rot_x_in: in data port radians;
-			es_rot_y_in: in data port radians;
-			es_rot_z_in: in data port radians;
-			mag_x_in: in data port magneto;
-			mag_y_in: in data port magneto;
-			mag_z_in: in data port magneto;
-			rate_x_in: in data port angularRate;
-			rate_y_in: in data port angularRate;
-			rate_z_in: in data port angularRate;
-			gps_long_in: in data port;
-			gps_lat_in: in data port;
-			gps_el_in: in data port;
-			gps_time_in: in data port;
-			st_rot_x_in: in data port radians;
-			st_rot_y_in: in data port radians;
-			st_rot_z_in: in data port radians;
-			
-			tor_x_out: out data port torque;
-			tor_y_out: out data port torque;
-			tor_z_out: out data port torque;
-			dV_x_out: out data port deltaV;
-			dV_y_out: out data port deltaV;
-			dV_z_out: out data port deltaV;
-			
-			aocs: requires bus access AocsBus;
-			tmtc: requires bus access TmTcBus;
-	end AocsCpu;
 	
-	device TmTcCpu
-		features
-			deltaV_x: in data port;
-			deltaV_y: in data port;
-			deltaV_z: in data port;
-
-			rot_x: out data port radians;
-			rot_y: out data port radians;
-			rot_z: out data port radians;
-			long: out data port;
-			lat: out data port;
-			el: out data port;
-			time: out data port;
-			new_command: out event port;
-			new_meter: out event port;
-			
-			tmtc: requires bus access TmTcBus;
-	end TmTcCpu;
+	
+	
+	
+	--------- DEVICE IMPLEMENTATIONS: SENSOR IMPLEMENTATION ---------------------
 
 	device implementation FineSunSensor.impl
 		properties
