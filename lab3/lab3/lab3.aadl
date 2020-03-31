@@ -40,6 +40,22 @@ public
 			Data_Model::Data_Representation => boolean;
 	end sunExist;
 	
+	-- position: for representing longitude, latitude and altitude data from GPS
+	data position 
+		properties
+			Data_Model::Data_Representation => float;
+	end position;
+	data gpsTimeStamp
+		properties
+			Data_Model::Data_Representation => string;
+	end gpsTimeStamp;
+	
+	-- data types for activation of devices
+	data deviceActivate
+		properties
+			Data_Model::Data_Representation => boolean;
+	end deviceActivate;
+	
 	
 	-- -------------------------- DEVICES --------------------------------------
 	
@@ -49,6 +65,7 @@ public
 			fss_rot_x: out data port radians;
 			fss_rot_y: out data port radians;
 			fss_rot_z: out data port radians;
+			fss_activte: in data port deviceActivation;
 			
 			comm: requires bus access AocsBus;
 			
@@ -63,6 +80,7 @@ public
 			css_rot_x: out data port radians;
 			css_rot_y: out data port radians;
 			css_rot_z: out data port radians;
+			css_activte: in data port deviceActivation;
 			
 			comm: requires bus access AocsBus;
 			
@@ -75,6 +93,8 @@ public
 	device SunPresenceSensor
 		features
 			is_present: out data port;
+			sps_activte: in data port deviceActivation;
+			
 			
 			comm: requires bus access AocsBus;
 			
@@ -87,6 +107,7 @@ public
 			es_rot_x: out data port radians;
 			es_rot_y: out data port radians;
 			es_rot_z: out data port radians;
+			es_activte: in data port deviceActivation;
 			
 			comm: requires bus access AocsBus;
 			
@@ -101,6 +122,7 @@ public
 			mag_x: out data port magneto;
 			mag_y: out data port magneto;
 			mag_z: out data port magneto;
+			mag_activte: in data port deviceActivation;
 			
 			comm: requires bus access AocsBus;
 			
@@ -115,6 +137,7 @@ public
 			rate_x: out data port angularRate;
 			rate_y: out data port angularRate;
 			rate_z: out data port angularRate;
+			rate_activte: in data port deviceActivation;
 			
 			comm: requires bus access AocsBus;
 			
@@ -126,10 +149,11 @@ public
 		
 	device GPS
 		features
-			long: out data port;
-			lat: out data port;
-			el: out data port;
-			time: out data port;
+			long: out data port position;
+			lat: out data port position;
+			el: out data port position;
+			time: out data port gpsTimeStamp;
+			gps_activte: in data port deviceActivation;
 			
 			comm: requires bus access AocsBus;
 			
@@ -145,6 +169,7 @@ public
 			st_rot_x: out data port radians;
 			st_rot_y: out data port radians;
 			st_rot_z: out data port radians;
+			st_activte: in data port deviceActivation;
 			
 			comm: requires bus access AocsBus;
 			
@@ -191,10 +216,10 @@ public
 			rot_x: in data port radians;
 			rot_y: in data port radians;
 			rot_z: in data port radians;
-			long: in data port;
-			lat: in data port;
-			el: in data port;
-			time: in data port;
+			long: in data port position;
+			lat: in data port position;
+			el: in data port position;
+			time: in data port gpsTimeStamp;
 			
 		flows
 			fx: flow sink rot_x {latency => 1ms .. 2ms;};
@@ -236,10 +261,10 @@ public
 			rate_x_in: in data port angularRate;
 			rate_y_in: in data port angularRate;
 			rate_z_in: in data port angularRate;
-			gps_long_in: in data port;
-			gps_lat_in: in data port;
-			gps_el_in: in data port;
-			gps_time_in: in data port;
+			gps_long_in: in data port position;
+			gps_lat_in: in data port position;
+			gps_el_in: in data port position;
+			gps_time_in: in data port gpsTimeStamp;
 			st_rot_x_in: in data port radians;
 			st_rot_y_in: in data port radians;
 			st_rot_z_in: in data port radians;
@@ -264,10 +289,10 @@ public
 			rot_x: out data port radians;
 			rot_y: out data port radians;
 			rot_z: out data port radians;
-			long: out data port;
-			lat: out data port;
-			el: out data port;
-			time: out data port;
+			long: out data port position;
+			lat: out data port position;
+			el: out data port position;
+			time: out data port gpsTimeStamp;
 			new_command: out event port;
 			new_meter: out event port;
 			
@@ -277,8 +302,8 @@ public
 	
 	-- --------------------- PROCESSES AND THREADS ---------------------
 	
-	-- process and threads for controlling attitude
-	process attitudeController
+	-- process and threads for controlling attitude (with implementations)
+	process attitudeController -- remember: the connections of the ports of a process with sensors is done in the system implementation
 		features
 			fss_rot_x: in data port radians;
 			fss_rot_y: in data port radians;
@@ -332,6 +357,13 @@ public
 			des_orient_z: out data port radians;
 	end fuseOrientation;
 	
+	thread implementation fuseOrientation.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end fuseOrientation.impl;
+	
+	
 	thread attitudeControlThread
 		features
 			des_orient_x: in data port radians;
@@ -349,15 +381,59 @@ public
 			Period => 100ms;
 	end attitudeControlThread.impl;
 	
+	process implementation attitudeController.impl
+		subcomponents
+			fusion_worker: thread fuseOrientation;
+			act_worker: thread attitudeControlThread;
+		connections
+			fss_x: port fss_rot_x -> fusion_worker.fss_rot_x;
+			fss_y: port fss_rot_y -> fusion_worker.fss_rot_y;
+			fss_z: port fss_rot_z -> fusion_worker.fss_rot_z;
+			
+			css_x: port css_rot_x -> fusion_worker.css_rot_x;
+			css_y: port css_rot_y -> fusion_worker.css_rot_y;
+			css_z: port css_rot_z -> fusion_worker.css_rot_z;
+			
+			sps: port sps_present -> fusion_worker.sps_present;
+			
+			es_x: port es_rot_x -> fusion_worker.es_rot_x;
+			es_y: port es_rot_y -> fusion_worker.es_rot_y;
+			es_z: port es_rot_z -> fusion_worker.es_rot_z;
+			
+			magx: port mag_x -> fusion_worker.mag_x;
+			magy: port mag_y -> fusion_worker.mag_y;
+			magz: port mag_z -> fusion_worker.mag_z;
+			
+			ratex: port rate_x -> fusion_worker.rate_x;
+			ratey: port rate_y -> fusion_worker.rate_y;
+			ratez: port rate_z -> fusion_worker.rate_z;
+			
+			st_x: port st_rot_x -> fusion_worker.st_rot_x;
+			st_y: port st_rot_y -> fusion_worker.st_rot_y;
+			st_z: port st_rot_z -> fusion_worker.st_rot_z;
+			
+			
+			des_x: port fusion_worker.des_orient_x -> act_worker.des_orient_x;
+			des_y: port fusion_worker.des_orient_y -> act_worker.des_orient_y;
+			des_z: port fusion_worker.des_orient_z -> act_worker.des_orient_z;
+			
+			tx: port act_worker.tor_x -> tor_x;
+			ty: port act_worker.tor_y -> tor_y;
+			tz: port act_worker.tor_z -> tor_z;
+	end attitudeController.impl;
 	
 	
-	-- process and thread for controlling the orbit
+	-- process and thread for controlling the orbit (with implementations)
 	process orbitController
 		features
-			gps_long: in data port;
-			gps_lat: in data port;
-			gps_el: in data port;
-			gps_time: in data port;
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
 			
 			dV_x: out data port deltaV;
 			dV_y: out data port deltaV;
@@ -366,15 +442,49 @@ public
 	
 	thread orbitControlThread
 		features
-			gps_long: in data port;
-			gps_lat: in data port;
-			gps_el: in data port;
-			gps_time: in data port;
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
 			
 			dV_x: out data port deltaV;
 			dV_y: out data port deltaV;
 			dV_z: out data port deltaV;
 	end orbitControlThread;
+	
+	thread implementation orbitControlThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 10000ms;
+	end orbitControlThread.impl;
+	
+	process implementation orbitController.impl
+		subcomponents
+			orbit_worker: thread orbitControlThread;
+		connections
+			gps_long_: port gps_long -> orbit_worker.gps_long;
+			gps_lat_: port gps_lat -> orbit_worker.gps_lat;
+			gps_el_: port gps_el -> orbit_worker.gps_el;
+			gps_time_: port gps_time -> orbit_worker.gps_time;
+			
+			st_x: port st_rot_x -> orbit_worker.st_rot_x;
+			st_y: port st_rot_y -> orbit_worker.st_rot_y;
+			st_z: port st_rot_z -> orbit_worker.st_rot_z;
+			
+			dv_x: port orbit_worker.dV_x -> dV_x;
+			dv_y: port orbit_worker.dV_y -> dV_y;
+			dv_z: port orbit_worker.dV_z -> dV_z;
+			
+	end orbitController.impl;
+	-- process and threads for detecting anomalies and reconfiguring the system (with implementations)
+	process AocsReconfiguration
+		features
+			
+	end AocsReconfiguration;
 	
 	
 	
