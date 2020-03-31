@@ -56,6 +56,11 @@ public
 			Data_Model::Data_Representation => boolean;
 	end deviceActivate;
 	
+	data aocsActivate
+		properties
+			Data_Model::Data_Representation => boolean;
+	end aocsActivate;
+	
 	
 	-- data types for defining telecommand messages from main compter. It includes 
 	-- mission mode, orbit parameters, desired orientation if any, and probably reconfiguration
@@ -226,38 +231,7 @@ public
 	
 	
 	
-	-- ---------------- DEVICES: COMPUTERS AND TELEMETRY --------------
-	device TeleMetry
-		features
-			rot_x: in data port radians;
-			rot_y: in data port radians;
-			rot_z: in data port radians;
-			long: in data port position;
-			lat: in data port position;
-			el: in data port position;
-			time: in data port gpsTimeStamp;
-			
-		flows
-			fx: flow sink rot_x {latency => 1ms .. 2ms;};
-			fy: flow sink rot_y {latency => 1ms .. 2ms;};
-			fz: flow sink rot_z {latency => 1ms .. 2ms;};
-			flo: flow sink long {latency => 1ms..2ms;};
-			fla: flow sink lat {latency => 1ms..2ms;};
-			fel: flow sink el {latency => 1ms..2ms;};
-			ft: flow sink time {latency => 1ms..2ms;};
-	end TeleMetry;
-	
-	device TeleCommand
-		features
-			deltaV_x: out data port;
-			deltaV_y: out data port;
-			deltaV_z: out data port;
-			
-		flows
-			fx: flow source deltaV_x {latency => 1ms .. 2ms;};
-			fy: flow source deltaV_y {latency => 1ms .. 2ms;};
-			fz: flow source deltaV_z {latency => 1ms .. 2ms;};	
-	end TeleCommand;
+	-- ---------------- DEVICES: COMPUTERS AND TELEMETRY -------------- 
 	
 	-- the main AOCS computer .... probably this will have to be repeated for redundency
 	device AocsCpu
@@ -293,6 +267,8 @@ public
 			telecommand_out: out data port telecommandString; -- will be sent to processes that need it
 			telemetry_in: in data port telemetryString;
 			telemetry_out: out data port telemetryString;
+			activate_in: in data port aocsActivate;
+			activate_out: out data port aocsActivate;
 			
 			-- activation values coming from the reconfiguration thread
 			fss_activate_in: in data port deviceActivate;
@@ -359,21 +335,12 @@ public
 			tmtc: requires bus access TmTcBus;
 	end AocsCpu;
 	
-	device TmTcCpu
+	-- defining the main onboard and data handling computer of the satellite
+	device ObdhCpu
 		features
-			deltaV_x: in data port;
-			deltaV_y: in data port;
-			deltaV_z: in data port;
-
-			rot_x: out data port radians;
-			rot_y: out data port radians;
-			rot_z: out data port radians;
-			long: out data port position;
-			lat: out data port position;
-			el: out data port position;
-			time: out data port gpsTimeStamp;
-			new_command: out event port;
-			new_meter: out event port;
+			telecommand: out data port telecommandString;
+			telemetry: in data port telemetryString;
+			activation: out data port aocsActivate;
 			
 			tmtc: requires bus access TmTcBus;
 	end TmTcCpu;
@@ -613,6 +580,7 @@ public
 			gps_time: in data port gpsTimeStamp;
 			
 			telecommand: in data port telecommandString;
+			activate: in data port aocsActivate;
 			
 			-- outputs of the process
 			fss_activate: out data port deviceActivate;
@@ -661,6 +629,7 @@ public
 			gps_time: in data port gpsTimeStamp;
 			
 			telecommand: in data port telecommandString;
+			activate: in data port aocsActivate;
 			
 			-- outputs of the thread
 			fss_activate: out data port deviceActivate;
@@ -716,7 +685,7 @@ public
 			gps_time_con: port gps_time -> worker.gps_time;
 	
 			telecommand_con: port telecommand -> worker.telecommand;
-			
+			activate_cond: port activate -> worker.activate;
 			
 			-- outputs connections
 			fss_act: port worker.fss_activate -> fss_activate;
