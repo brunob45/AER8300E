@@ -57,6 +57,13 @@ public
 	end deviceActivate;
 	
 	
+	-- data types for defining mission modes
+	data missionMode
+		properties
+			Data_Model:: Data_Representation => int;
+	end missionMode;
+	
+	
 	-- -------------------------- DEVICES --------------------------------------
 	
 	-- -----------------DEVICES: SENSORS ----------------------
@@ -269,6 +276,8 @@ public
 			st_rot_y_in: in data port radians;
 			st_rot_z_in: in data port radians;
 			
+			mission_mode: in data port missionMode;
+			
 			tor_x_out: out data port torque;
 			tor_y_out: out data port torque;
 			tor_z_out: out data port torque;
@@ -478,18 +487,160 @@ public
 			dv_x: port orbit_worker.dV_x -> dV_x;
 			dv_y: port orbit_worker.dV_y -> dV_y;
 			dv_z: port orbit_worker.dV_z -> dV_z;
-			
 	end orbitController.impl;
+	
+	
+	
 	-- process and threads for detecting anomalies and reconfiguring the system (with implementations)
+	
+	-- this process takes all sensor inputs, compares them and produces on/off signals to (de)activate devices
 	process AocsReconfiguration
 		features
+			-- inputs of the process
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			mission_mode: in data port missionMode;
+			
+			-- outputs of the process
+			fss_activate: out data port deviceActivate;
+			css_activate: out data port deviceActivate;
+			sps_activate: out data port deviceActivate;
+			es_activate: out data port deviceActivate;
+			mag_activate: out data port deviceActivate;
+			st_activate: out data port deviceActivate;
+			gps_activate: out data port deviceActivate;
 			
 	end AocsReconfiguration;
 	
+	-- this thread is responsible for comparing sensor readings, checking their ranges and issue (de)activation commands for different devices (sensors basically) 
+	thread AocsReconfigurationThread
+		-- inputs of the thread
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			mission_mode: in data port missionMode;
+			
+			-- outputs of the thread
+			fss_activate: out data port deviceActivate;
+			css_activate: out data port deviceActivate;
+			sps_activate: out data port deviceActivate;
+			es_activate: out data port deviceActivate;
+			mag_activate: out data port deviceActivate;
+			st_activate: out data port deviceActivate;
+			gps_activate: out data port deviceActivate;
+	end AocsReconfigurationThread;
+	
+	thread implementation AocsReconfigurationThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end AocsReconfigurationThread.impl;
 	
 	
+	process implementation AocsReconfiguration.impl
+		subcomponents
+			worker: thread AocsReconfigurationThread;
+		connections
+			-- inputs connections
+			fss_x: port fss_rot_x -> worker.fss_rot_x;
+			fss_y: port fss_rot_y -> worker.fss_rot_y;
+			fss_z: port fss_rot_z -> worker.fss_rot_z;
+			
+			css_x: port css_rot_x -> worker.css_rot_x;
+			css_y: port css_rot_y -> worker.css_rot_y;
+			css_z: port css_rot_z -> worker.css_rot_z;
+			
+			sps: port sps_present -> worker.sps_present;
+			
+			es_x: port es_rot_x -> worker.es_rot_x;
+			es_y: port es_rot_y -> worker.es_rot_y;
+			es_z: port es_rot_z -> worker.es_rot_z;
+			
+			magx: port mag_x -> worker.mag_x;
+			magy: port mag_y -> worker.mag_y;
+			magz: port mag_z -> worker.mag_z;
+			
+			ratex: port rate_x -> worker.rate_x;
+			ratey: port rate_y -> worker.rate_y;
+			ratez: port rate_z -> worker.rate_z;
+			
+			st_x: port st_rot_x -> worker.st_rot_x;
+			st_y: port st_rot_y -> worker.st_rot_y;
+			st_z: port st_rot_z -> worker.st_rot_z;
+			
+			gps_long_: port gps_long -> worker.gps_long;
+			gps_lat_: port gps_lat -> worker.gps_lat;
+			gps_el_: port gps_el -> worker.gps_el;
+			gps_time_: port gps_time -> worker.gps_time;
 	
-	
+			
+			-- outputs connections
+			fss_act: port worker.fss_activate -> fss_activate;
+			css_act: port worker.css_activate -> css_activate;
+			sps_act: port worker.sps_activate -> sps_activate;
+			es_act: port worker.es_activate -> es_activate;
+			mag_act: port worker.mag_activate -> mag_activate;
+			st_act: port worker.st_activate -> st_activate;
+			gps_act: port worker.gps_activate -> gps_activate;
+							
+	end AocsReconfiguration.impl;
 	
 	--------- DEVICE IMPLEMENTATIONS: SENSOR IMPLEMENTATION ---------------------
 
