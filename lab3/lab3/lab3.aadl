@@ -809,13 +809,13 @@ public
 	thread implementation sendTelemetryThread.impl
 		properties
 			Dispatch_Protocol => Periodic;
-			Period => 100ms;
+			Period => 1000ms;
 	end sendTelemetryThread.impl;
 	
 	
 	process implementation sendTelemetry.impl
 		subcomponents
-			worker = thread sendTelemetryThread;
+			worker: thread sendTelemetryThread;
 		connections
 			fss_x: port fss_rot_x -> worker.fss_rot_x;
 			fss_y: port fss_rot_y -> worker.fss_rot_y;
@@ -848,7 +848,7 @@ public
 			gps_el_con: port gps_el -> worker.gps_el;
 			gps_time_con: port gps_time -> worker.gps_time;
 			
-			telemetry_con: port worker.telemeteryMessage -> telemeteryMessage;
+			telemetry_con: port worker.telemtryMessage -> telemtryMessage;
 			 
 	end sendTelemetry.impl;
 	
