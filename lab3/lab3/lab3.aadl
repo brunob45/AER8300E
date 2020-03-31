@@ -250,6 +250,7 @@ public
 			fz: flow source deltaV_z {latency => 1ms .. 2ms;};	
 	end TeleCommand;
 	
+	-- the main AOCS computer .... probably this will have to be repeated for redundency
 	device AocsCpu
 		features
 			fss_rot_x_in: in data port radians;
