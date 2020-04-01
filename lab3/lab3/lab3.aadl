@@ -2,6 +2,9 @@ package lab3
 public
 	with Data_Model;
 	
+	system Satellite
+	end Satellite;
+	
 	bus AocsBus
 	end AocsBus;
 	
@@ -290,16 +293,6 @@ public
 			gps_activate_in: in data port deviceActivate;
 			
 			
-			-- activation values going to devices
-			fss_activate_out: out data port deviceActivate;
-			css_activate_out: out data port deviceActivate;
-			sps_activate_out: out data port deviceActivate;
-			es_activate_out: out data port deviceActivate;
-			mag_activate_out: out data port deviceActivate;
-			rate_activate_out: out data port deviceActivate;
-			st_activate_out: out data port deviceActivate;
-			gps_activate_out: out data port deviceActivate;
-			
 			-- actuation values received from actuation processes 
 			tor_x_in: in data port torque;
 			tor_y_in: in data port torque;
@@ -339,6 +332,7 @@ public
 			sps_activate_out: out data port deviceActivate;
 			es_activate_out: out data port deviceActivate;
 			mag_activate_out: out data port deviceActivate;
+			rate_activate_out: out data port deviceActivate;
 			st_activate_out: out data port deviceActivate;
 			gps_activate_out: out data port deviceActivate;
 			
@@ -952,7 +946,7 @@ public
 			css_z: port css_sens.css_rot_z -> aocs_cpu.css_rot_z_in;
 			css_active: port aocs_cpu.css_activate_out -> css_sens.css_activate;
 			
-			sps: port sps_sens.sps_present -> aocs_cpu.sps_present_in;
+			sps: port sps_sens.is_present -> aocs_cpu.sps_present_in;
 			sps_active: port aocs_cpu.sps_activate_out -> sps_sens.sps_activate;
 			
 			es_x: port es_sens.es_rot_x -> aocs_cpu.es_rot_x_in;
@@ -968,21 +962,27 @@ public
 			ratex: port gyro_sens.rate_x -> aocs_cpu.rate_x_in;
 			ratey: port gyro_sens.rate_y -> aocs_cpu.rate_y_in;
 			ratez: port gyro_sens.rate_z -> aocs_cpu.rate_z_in;
-			gyro_active: port aocs_cpu.rate_activate_out -> gps_sens.rate_activate;
+			gyro_active: port aocs_cpu.rate_activate_out -> gyro_sens.rate_activate;
 			
 			st_x: port st_sens.st_rot_x -> aocs_cpu.st_rot_x_in;
 			st_y: port st_sens.st_rot_y -> aocs_cpu.st_rot_y_in;
 			st_z: port st_sens.st_rot_z -> aocs_cpu.st_rot_z_in;
 			st_active: port aocs_cpu.st_activate_out -> st_sens.st_activate;
 			
-			gps_long_con: port gps_sens.gps_long -> aocs_cpu.gps_long_in;
-			gps_lat_con: port gps_sens.gps_lat -> aocs_cpu.gps_lat_in;
-			gps_el_con: port gps_sens.gps_el -> aocs_cpu.gps_el_in;
-			gps_time_con: port gps_sens.gps_time -> aocs_cpu.gps_time_in;
+			gps_long_con: port gps_sens.long -> aocs_cpu.gps_long_in;
+			gps_lat_con: port gps_sens.lat -> aocs_cpu.gps_lat_in;
+			gps_el_con: port gps_sens.el -> aocs_cpu.gps_el_in;
+			gps_time_con: port gps_sens.time -> aocs_cpu.gps_time_in;
 			gps_active: port aocs_cpu.gps_activate_out -> gps_sens.gps_activate;
-	
-			telecommand_con: port telecommand -> worker.telecommand;
-			activate_cond: port activate -> worker.activate;
+			
+			-- actuator connections to cpu
+			tor_x_con: port aocs_cpu.tor_x_out -> inertia_wheel.tor_x;
+			tor_y_con: port aocs_cpu.tor_y_out -> inertia_wheel.tor_y;
+			tor_z_con: port aocs_cpu.tor_z_out -> inertia_wheel.tor_z;
+			
+			
+--			telecommand_con: port telecommand -> worker.telecommand;
+--			activate_cond: port activate -> worker.activate;
 			
 			
 	end Satellite.impl;
