@@ -352,7 +352,7 @@ public
 			activation: out data port aocsActivate;
 			
 			tmtc: requires bus access TmTcBus;
-	end TmTcCpu;
+	end ObdhCpu;
 	
 	
 	-- defining the watchdog that is responsible for monitoring the AOCS
@@ -871,7 +871,7 @@ public
 		subcomponents 
 			worker: thread watchdogEventThread;
 		connections
-			to_watchdog_con: worker.to_watchdog -> to_watchdog;
+			to_watchdog_con: port worker.to_watchdog -> to_watchdog;
 	end watchdogEvent.impl;
 	
 	
