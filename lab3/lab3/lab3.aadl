@@ -913,7 +913,7 @@ public
 			fss_rot_z: out data port radians;
 			fss_activate: in data port deviceActivate;
 			
-			comm: requires bus access AocsBus;
+			comm: requires bus access AocsBus_r;
 			
 		flows
 			fx: flow source fss_rot_x {latency => 1ms..2ms;};
@@ -928,7 +928,7 @@ public
 			css_rot_z: out data port radians;
 			css_activate: in data port deviceActivate;
 			
-			comm: requires bus access AocsBus;
+			comm: requires bus access AocsBus_r;
 			
 		flows
 			fx: flow source css_rot_x {latency => 1ms..2ms;};
@@ -942,7 +942,7 @@ public
 			sps_activate: in data port deviceActivate;
 			
 			
-			comm: requires bus access AocsBus;
+			comm: requires bus access AocsBus_r;
 			
 		flows
 			fi: flow source is_present {latency => 1ms..2ms;};
@@ -955,7 +955,7 @@ public
 			es_rot_z: out data port radians;
 			es_activate: in data port deviceActivate;
 			
-			comm: requires bus access AocsBus;
+			comm: requires bus access AocsBus_r;
 			
 		flows
 			fx: flow source es_rot_x {latency => 1ms..2ms;};
@@ -970,7 +970,7 @@ public
 			mag_z: out data port magneto;
 			mag_activate: in data port deviceActivate;
 			
-			comm: requires bus access AocsBus;
+			comm: requires bus access AocsBus_r;
 			
 		flows
 			fx: flow source mag_x {latency => 1ms..2ms;};
@@ -985,7 +985,7 @@ public
 			rate_z: out data port angularRate;
 			rate_activate: in data port deviceActivate;
 			
-			comm: requires bus access AocsBus;
+			comm: requires bus access AocsBus_r;
 			
 		flows
 			fx: flow source rate_x {latency => 1ms..2ms;};
@@ -1001,7 +1001,7 @@ public
 			time: out data port gpsTimeStamp;
 			gps_activate: in data port deviceActivate;
 			
-			comm: requires bus access AocsBus;
+			comm: requires bus access AocsBus_r;
 			
 		flows
 			fx: flow source long {latency => 1ms..2ms;};
@@ -1017,7 +1017,7 @@ public
 			st_rot_z: out data port radians;
 			st_activate: in data port deviceActivate;
 			
-			comm: requires bus access AocsBus;
+			comm: requires bus access AocsBus_r;
 			
 		flows
 			fx: flow source st_rot_x {latency => 1ms..2ms;};
@@ -1225,7 +1225,7 @@ public
 			 
 			 -- including the busses needed 
 			 aocs_bus: bus AocsBus;
-			 aocs_bus_r: bus AocsBus;
+			 aocs_bus_r: bus AocsBus_r;
 			 tmtc_bus: bus TmTcBus;
 			 
 			 
@@ -1370,9 +1370,9 @@ public
 			obdh_aocs_telec: port obdh_cpu.telecommand_out -> aocs_cpu.telecommand_in;
 			
 			-- aocs_cpu <-> obdh_cpu connection (redundant)
-			obdh_aocs_act: port obdh_cpu.activation_out -> aocs_cpu_r.activate_in;
-			obdh_aocs_telem: port aocs_cpu_r.telemetry_out -> obdh_cpu.telemetry_in;
-			obdh_aocs_telec: port obdh_cpu_r.telecommand_out -> aocs_cpu_r.telecommand_in;
+			obdh_aocs_act_r: port obdh_cpu.activation_out -> aocs_cpu_r.activate_in;
+			obdh_aocs_telem_r: port aocs_cpu_r.telemetry_out -> obdh_cpu.telemetry_in;
+			obdh_aocs_telec_r: port obdh_cpu.telecommand_out -> aocs_cpu_r.telecommand_in;
 			
 			-- watchdog connections (main)
 			aocs_watch: port aocs_cpu.to_watchdog_out -> watchdog_module.watchdog_acos_main_in;
