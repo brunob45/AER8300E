@@ -125,7 +125,7 @@ public
 	
 	device SunPresenceSensor
 		features
-			is_present: out data port;
+			is_present: out data port sunExist;
 			sps_activate: in data port deviceActivate;
 			
 			
@@ -926,7 +926,7 @@ public
 	
 	device SunPresenceSensor_r
 		features
-			is_present: out data port;
+			is_present: out data port sunExist;
 			sps_activate: in data port deviceActivate;
 			
 			
