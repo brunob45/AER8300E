@@ -92,7 +92,7 @@ public
 			fss_rot_x: out data port radians;
 			fss_rot_y: out data port radians;
 			fss_rot_z: out data port radians;
-			fss_activte: in data port deviceActivate;
+			fss_activate: in data port deviceActivate;
 			
 			comm: requires bus access AocsBus;
 			
@@ -107,7 +107,7 @@ public
 			css_rot_x: out data port radians;
 			css_rot_y: out data port radians;
 			css_rot_z: out data port radians;
-			css_activte: in data port deviceActivate;
+			css_activate: in data port deviceActivate;
 			
 			comm: requires bus access AocsBus;
 			
@@ -120,7 +120,7 @@ public
 	device SunPresenceSensor
 		features
 			is_present: out data port;
-			sps_activte: in data port deviceActivate;
+			sps_activate: in data port deviceActivate;
 			
 			
 			comm: requires bus access AocsBus;
@@ -134,7 +134,7 @@ public
 			es_rot_x: out data port radians;
 			es_rot_y: out data port radians;
 			es_rot_z: out data port radians;
-			es_activte: in data port deviceActivate;
+			es_activate: in data port deviceActivate;
 			
 			comm: requires bus access AocsBus;
 			
@@ -149,7 +149,7 @@ public
 			mag_x: out data port magneto;
 			mag_y: out data port magneto;
 			mag_z: out data port magneto;
-			mag_activte: in data port deviceActivate;
+			mag_activate: in data port deviceActivate;
 			
 			comm: requires bus access AocsBus;
 			
@@ -164,7 +164,7 @@ public
 			rate_x: out data port angularRate;
 			rate_y: out data port angularRate;
 			rate_z: out data port angularRate;
-			rate_activte: in data port deviceActivate;
+			rate_activate: in data port deviceActivate;
 			
 			comm: requires bus access AocsBus;
 			
@@ -180,7 +180,7 @@ public
 			lat: out data port position;
 			el: out data port position;
 			time: out data port gpsTimeStamp;
-			gps_activte: in data port deviceActivate;
+			gps_activate: in data port deviceActivate;
 			
 			comm: requires bus access AocsBus;
 			
@@ -196,7 +196,7 @@ public
 			st_rot_x: out data port radians;
 			st_rot_y: out data port radians;
 			st_rot_z: out data port radians;
-			st_activte: in data port deviceActivate;
+			st_activate: in data port deviceActivate;
 			
 			comm: requires bus access AocsBus;
 			
@@ -285,9 +285,20 @@ public
 			sps_activate_in: in data port deviceActivate;
 			es_activate_in: in data port deviceActivate;
 			mag_activate_in: in data port deviceActivate;
+			rate_activate_in: in data port deviceActivate;
 			st_activate_in: in data port deviceActivate;
 			gps_activate_in: in data port deviceActivate;
 			
+			
+			-- activation values going to devices
+			fss_activate_out: out data port deviceActivate;
+			css_activate_out: out data port deviceActivate;
+			sps_activate_out: out data port deviceActivate;
+			es_activate_out: out data port deviceActivate;
+			mag_activate_out: out data port deviceActivate;
+			rate_activate_out: out data port deviceActivate;
+			st_activate_out: out data port deviceActivate;
+			gps_activate_out: out data port deviceActivate;
 			
 			-- actuation values received from actuation processes 
 			tor_x_in: in data port torque;
@@ -615,6 +626,7 @@ public
 			sps_activate: out data port deviceActivate;
 			es_activate: out data port deviceActivate;
 			mag_activate: out data port deviceActivate;
+			rate_activate: out data port deviceActivate;
 			st_activate: out data port deviceActivate;
 			gps_activate: out data port deviceActivate;
 			
@@ -664,6 +676,7 @@ public
 			sps_activate: out data port deviceActivate;
 			es_activate: out data port deviceActivate;
 			mag_activate: out data port deviceActivate;
+			rate_activate: out data port deviceActivate;
 			st_activate: out data port deviceActivate;
 			gps_activate: out data port deviceActivate;
 	end AocsReconfigurationThread;
@@ -720,6 +733,7 @@ public
 			sps_act: port worker.sps_activate -> sps_activate;
 			es_act: port worker.es_activate -> es_activate;
 			mag_act: port worker.mag_activate -> mag_activate;
+			rate_act: port worker.rate_activate -> rate_activate;
 			st_act: port worker.st_activate -> st_activate;
 			gps_act: port worker.gps_activate -> gps_activate;
 							
@@ -876,6 +890,102 @@ public
 	
 	
 	
+	-- ----------------------SYSTEM IMPLEMENTAITON (CONNECTIONS BETWEEN DEVICES)--------------
+	system implementation Satellite.impl
+		subcomponents
+			-- including the sensors in the satellite
+			fss_sens: device FineSunSensor;
+			css_sens: device CoarseSunSensor;
+			sps_sens: device SunPresenceSensor;
+			es_sens: device EarthSensor;
+			mag_sens: device Magnetometer;
+			gyro_sens: device Gyroscope;
+			gps_sens: device GPS;
+			st_sens: device StarTracker;
+			
+			-- including the actuators in the satellite
+			inertia_wheel: device RxWheel;
+			thruster: device Thruster;
+			
+			-- including the CPUs in the system
+			aocs_cpu: device AocsCpu;
+			obdh_cpu: device ObdhCpu;
+			watchdog_module: device watchdog;
+			
+			-- including the processes in the system
+			 attitude_cont: process attitudeController;
+			 orbit_cont: process orbitController;
+			 aocs_reconfig: process AocsReconfiguration;
+			 send_telem: process sendTelemetry;
+			 watchdog_event: process watchdogEvent;
+			 
+			 -- including the busses needed 
+			 aocs_bus: bus AocsBus;
+			 tmtc_bus: bus TmTcBus;
+			 
+			 
+		connections
+			
+			-- buses connections
+			comm_fss: bus access aocs_bus <-> fss_sens.comm;
+			comm_css: bus access aocs_bus <-> css_sens.comm;
+			comm_sps: bus access aocs_bus <-> sps_sens.comm;
+			comm_es: bus access aocs_bus <-> es_sens.comm;
+			comm_mag: bus access aocs_bus <-> mag_sens.comm;
+			comm_gyro: bus access aocs_bus <-> gyro_sens.comm;
+			comm_gps: bus access aocs_bus <-> gps_sens.comm;
+			comm_st: bus access aocs_bus <-> st_sens.comm;
+			
+			comm_aocs_cpu: bus access aocs_bus <-> aocs_cpu.aocs;
+			comm_aocs_to_obdh: bus access tmtc_bus <-> aocs_cpu.tmtc;
+			
+			
+			
+			-- sensor connections to cpu (sens data + activation signal)
+			fss_x: port fss_sens.fss_rot_x -> aocs_cpu.fss_rot_x_in;
+			fss_y: port fss_sens.fss_rot_y -> aocs_cpu.fss_rot_y_in;
+			fss_z: port fss_sens.fss_rot_z -> aocs_cpu.fss_rot_z_in;
+			fss_active: port aocs_cpu.fss_activate_out -> fss_sens.fss_activate;
+			
+			css_x: port css_sens.css_rot_x -> aocs_cpu.css_rot_x_in;
+			css_y: port css_sens.css_rot_y -> aocs_cpu.css_rot_y_in;
+			css_z: port css_sens.css_rot_z -> aocs_cpu.css_rot_z_in;
+			css_active: port aocs_cpu.css_activate_out -> css_sens.css_activate;
+			
+			sps: port sps_sens.sps_present -> aocs_cpu.sps_present_in;
+			sps_active: port aocs_cpu.sps_activate_out -> sps_sens.sps_activate;
+			
+			es_x: port es_sens.es_rot_x -> aocs_cpu.es_rot_x_in;
+			es_y: port es_sens.es_rot_y -> aocs_cpu.es_rot_y_in;
+			es_z: port es_sens.es_rot_z -> aocs_cpu.es_rot_z_in;
+			es_active: port aocs_cpu.es_activate_out -> es_sens.es_activate;
+			
+			magx: port mag_sens.mag_x -> aocs_cpu.mag_x_in;
+			magy: port mag_sens.mag_y -> aocs_cpu.mag_y_in;
+			magz: port mag_sens.mag_z -> aocs_cpu.mag_z_in;
+			mag_active: port aocs_cpu.mag_activate_out -> mag_sens.mag_activate;
+			
+			ratex: port gyro_sens.rate_x -> aocs_cpu.rate_x_in;
+			ratey: port gyro_sens.rate_y -> aocs_cpu.rate_y_in;
+			ratez: port gyro_sens.rate_z -> aocs_cpu.rate_z_in;
+			gyro_active: port aocs_cpu.rate_activate_out -> gps_sens.rate_activate;
+			
+			st_x: port st_sens.st_rot_x -> aocs_cpu.st_rot_x_in;
+			st_y: port st_sens.st_rot_y -> aocs_cpu.st_rot_y_in;
+			st_z: port st_sens.st_rot_z -> aocs_cpu.st_rot_z_in;
+			st_active: port aocs_cpu.st_activate_out -> st_sens.st_activate;
+			
+			gps_long_con: port gps_sens.gps_long -> aocs_cpu.gps_long_in;
+			gps_lat_con: port gps_sens.gps_lat -> aocs_cpu.gps_lat_in;
+			gps_el_con: port gps_sens.gps_el -> aocs_cpu.gps_el_in;
+			gps_time_con: port gps_sens.gps_time -> aocs_cpu.gps_time_in;
+			gps_active: port aocs_cpu.gps_activate_out -> gps_sens.gps_activate;
+	
+			telecommand_con: port telecommand -> worker.telecommand;
+			activate_cond: port activate -> worker.activate;
+			
+			
+	end Satellite.impl;
 	
 	
 	--------- DEVICE IMPLEMENTATIONS: SENSOR IMPLEMENTATION ---------------------
