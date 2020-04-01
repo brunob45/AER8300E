@@ -1,0 +1,78 @@
+package lab3::types
+public
+	with Data_Model;
+	
+	data radians
+		properties
+			Data_Model::Data_Representation => float;
+	end radians;
+	
+	data torque
+		properties
+			Data_Model::Data_Representation => float;
+	end torque;
+	
+	data deltaV
+		properties
+			Data_Model::Data_Representation => float;
+	end deltaV;
+	
+	data magneto
+		properties
+			Data_Model::Data_Representation => float;
+	end magneto;
+	
+	data angularRate
+		properties
+			Data_Model::Data_Representation => float;
+	end angularRate;
+	
+	data sunExist
+		properties
+			Data_Model::Data_Representation => boolean;
+	end sunExist;
+	
+	-- position: for representing longitude, latitude and altitude data from GPS
+	data position 
+		properties
+			Data_Model::Data_Representation => float;
+	end position;
+	data gpsTimeStamp
+		properties
+			Data_Model::Data_Representation => string;
+	end gpsTimeStamp;
+	
+	-- data types for activation of devices
+	data deviceActivate
+		properties
+			Data_Model::Data_Representation => boolean;
+	end deviceActivate;
+	
+	data aocsActivate
+		properties
+			Data_Model::Data_Representation => boolean;
+	end aocsActivate;
+	
+	
+	-- data types for defining telecommand messages from main compter. It includes 
+	-- mission mode, orbit parameters, desired orientation if any, and probably reconfiguration
+	-- commands if needed
+	data telecommandString
+		properties
+			Data_Model:: Data_Representation => string;
+	end telecommandString;
+	
+	
+	-- data type for desired orbit parameters sent to AOCS via tele-command (basically a string with desired values)
+	 data telemetryString
+	 	properties
+	 		Data_Model::Data_Representation => string;
+	 end telemetryString;
+	 
+	 -- data type for signals to be sent to the watchdog by AOCS computers
+	 data watchdogString
+	 	properties
+	 		Data_Model::Data_Representation => string;
+	 end watchdogString;
+	
+end lab3::types;
