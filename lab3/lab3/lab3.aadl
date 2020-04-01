@@ -76,6 +76,12 @@ public
 	 	properties
 	 		Data_Model::Data_Representation => string;
 	 end telemetryString;
+	 
+	 -- data type for signals to be sent to the watchdog by AOCS computers
+	 data watchdogString
+	 	properties
+	 		Data_Model::Data_Representation => string;
+	 end watchdogString;
 	
 	
 	-- -------------------------- DEVICES --------------------------------------
@@ -270,6 +276,9 @@ public
 			activate_in: in data port aocsActivate;
 			activate_out: out data port aocsActivate;
 			
+			-- stuff related to the watchdog
+			to_watchdog: out data port watchdogString;
+			
 			-- activation values coming from the reconfiguration thread
 			fss_activate_in: in data port deviceActivate;
 			css_activate_in: in data port deviceActivate;
@@ -345,6 +354,24 @@ public
 			tmtc: requires bus access TmTcBus;
 	end TmTcCpu;
 	
+	
+	-- defining the watchdog that is responsible for monitoring the AOCS
+	device watchdog
+		features
+			-- to be received from AOCS computers
+			watchdog_acos_main_in: in data port watchdogString;
+			watchdog_acos_red_in: in data port watchdogString;
+			
+			-- to be sent to a thread
+			watchdog_acos_main_out: out data port watchdogString;
+			watchdog_acos_red_out: out data port watchdogString;
+			
+			watchdog_response_main_in: in data port aocsActivate;
+			watchdog_response_red_in: in data port aocsActivate;
+			watchdog_response_main_out: out data port aocsActivate;
+			watchdog_response_red_out: out data port aocsActivate;
+			
+	end watchdog;
 	
 	-- --------------------- PROCESSES AND THREADS ---------------------
 	
@@ -700,6 +727,7 @@ public
 	
 	
 	
+	-- telemeetry related processes and threads
 	process sendTelemetry
 		features
 			-- inputs of the process
@@ -820,6 +848,35 @@ public
 			telemetry_con: port worker.telemtryMessage -> telemtryMessage;
 			 
 	end sendTelemetry.impl;
+	
+	
+	-- watchdog related processes and threads
+	process watchdogEvent
+		features
+			to_watchdog: out data port watchdogString;
+	end watchdogEvent;
+	
+	thread watchdogEventThread
+		features
+			to_watchdog: out data port watchdogString;
+	end watchdogEventThread;
+	
+	thread implementation watchdogEventThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 1000ms;
+	end watchdogEventThread.impl;
+	
+	process implementation watchdogEvent.impl --very simple thread that contains a function that generates a periodic event to be sent to watchdog
+		subcomponents 
+			worker: thread watchdogEventThread;
+		connections
+			to_watchdog_con: worker.to_watchdog -> to_watchdog;
+	end watchdogEvent.impl;
+	
+	
+	
+	
 	
 	--------- DEVICE IMPLEMENTATIONS: SENSOR IMPLEMENTATION ---------------------
 
