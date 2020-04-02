@@ -120,14 +120,14 @@ public
 		subcomponents
 			orbit_worker: thread orbitControlThread;
 		connections
-			gps_long_con: port gps_pos -> orbit_worker.gps_pos;
+			gps_pos_con: port gps_pos -> orbit_worker.gps_pos;
 			gps_time_con: port gps_time -> orbit_worker.gps_time;
 			
-			st_x: port st_rot -> orbit_worker.st_rot;
+			st_con: port st_rot -> orbit_worker.st_rot;
 			
-			mission_mode_in: port telecommand -> orbit_worker.telecommand;
+			mission_mode_con: port telecommand -> orbit_worker.telecommand;
 			
-			dv_x_in: port orbit_worker.dV -> dV;
+			dv_con: port orbit_worker.dV -> dV;
 	end orbitController.impl;
 	
 	
@@ -217,19 +217,19 @@ public
 			worker: thread AocsReconfigurationThread;
 		connections
 			-- inputs connections
-			fss_x: port fss_rot -> worker.fss_rot;
+			fss_con: port fss_rot -> worker.fss_rot;
 			
-			css_x: port css_rot -> worker.css_rot;
+			css_con: port css_rot -> worker.css_rot;
 			
-			sps: port sps_present -> worker.sps_present;
+			sps_con: port sps_present -> worker.sps_present;
 			
-			es_x: port es_rot -> worker.es_rot;
+			es_con: port es_rot -> worker.es_rot;
 			
-			magx: port mag -> worker.mag;
+			mag_con: port mag -> worker.mag;
 			
 			rate_con: port rate -> worker.rate;
 			
-			st_x: port st_rot -> worker.st_rot;
+			st_con: port st_rot -> worker.st_rot;
 			
 			gps_pos_con: port gps_pos -> worker.gps_pos;
 			gps_time_con: port gps_time -> worker.gps_time;
@@ -246,7 +246,7 @@ public
 			rate_act: port worker.rate_activate -> rate_activate;
 			st_act: port worker.st_activate -> st_activate;
 			gps_act: port worker.gps_activate -> gps_activate;
-							
+
 	end AocsReconfiguration.impl;
 	
 	
@@ -310,25 +310,25 @@ public
 		subcomponents
 			worker: thread sendTelemetryThread;
 		connections
-			fss_x: port fss_rot -> worker.fss_rot;
+			fss_con: port fss_rot -> worker.fss_rot;
 			
-			css_x: port css_rot -> worker.css_rot;
+			css_con: port css_rot -> worker.css_rot;
 			
-			sps: port sps_present -> worker.sps_present;
+			sps_con: port sps_present -> worker.sps_present;
 			
-			es_x: port es_rot -> worker.es_rot;
+			es_con: port es_rot -> worker.es_rot;
 			
-			magx: port mag -> worker.mag;
+			mag_con: port mag -> worker.mag;
 			
-			ratex: port rate -> worker.rate;
+			rate_con: port rate -> worker.rate;
 			
-			st_x: port st_rot -> worker.st_rot;
+			st_con: port st_rot -> worker.st_rot;
 			
 			gps_pos_con: port gps_pos -> worker.gps_pos;
 			gps_time_con: port gps_time -> worker.gps_time;
 			
 			telemetry_con: port worker.telemtryMessage -> telemtryMessage;
-			 
+
 	end sendTelemetry.impl;
 	
 	
