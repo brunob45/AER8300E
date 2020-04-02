@@ -1,31 +1,58 @@
 package lab3::types
 public
 	with Data_Model;
+	with base_types;
+
+	data orientation
+	end orientation;
+
+	data implementation orientation.i
+		subcomponents
+			x : data base_types::float;
+			y : data base_types::float;
+			z : data base_types::float;
+	end orientation.i;
 	
-	data radians
-		properties
-			Data_Model::Data_Representation => float;
-	end radians;
+	data delta_v
+	end delta_v;
+
+	data implementation delta_v.i
+		subcomponents
+			x : data base_types::float;
+			y : data base_types::float;
+			z : data base_types::float;
+	end delta_v.i;
+
+	data position
+	end position;
+
+	data implementation position.i
+		subcomponents
+			lo : data base_types::float;
+			la : data base_types::float;
+			al : data base_types::float;
+	end position.i;
+	
+	data angular_rate
+	end angular_rate;
+
+	data implementation angular_rate.i
+		subcomponents
+			lo : data base_types::float;
+			la : data base_types::float;
+			al : data base_types::float;
+	end angular_rate.i;
+	
 	
 	data torque
-		properties
-			Data_Model::Data_Representation => float;
 	end torque;
-	
-	data deltaV
-		properties
-			Data_Model::Data_Representation => float;
-	end deltaV;
-	
-	data magneto
-		properties
-			Data_Model::Data_Representation => float;
-	end magneto;
-	
-	data angularRate
-		properties
-			Data_Model::Data_Representation => float;
-	end angularRate;
+
+	data implementation torque.i
+		subcomponents
+			lo : data base_types::float;
+			la : data base_types::float;
+			al : data base_types::float;
+	end torque.i;
 	
 	data sunExist
 		properties
@@ -33,10 +60,6 @@ public
 	end sunExist;
 	
 	-- position: for representing longitude, latitude and altitude data from GPS
-	data position 
-		properties
-			Data_Model::Data_Representation => float;
-	end position;
 	data gpsTimeStamp
 		properties
 			Data_Model::Data_Representation => string;

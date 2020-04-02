@@ -7,60 +7,32 @@ public
 	-- process and threads for controlling attitude (with implementations)
 	process attitudeController -- remember: the connections of the ports of a process with sensors is done in the system implementation
 		features
-			fss_rot_x: in data port lab3::types::radians;
-			fss_rot_y: in data port lab3::types::radians;
-			fss_rot_z: in data port lab3::types::radians;
-			css_rot_x: in data port lab3::types::radians;
-			css_rot_y: in data port lab3::types::radians;
-			css_rot_z: in data port lab3::types::radians;
+			fss_rot: in data port lab3::types::orientation;
+			css_rot: in data port lab3::types::orientation;
 			sps_present: in data port lab3::types::sunExist;
-			es_rot_x: in data port lab3::types::radians;
-			es_rot_y: in data port lab3::types::radians;
-			es_rot_z: in data port lab3::types::radians;
-			mag_x: in data port lab3::types::magneto;
-			mag_y: in data port lab3::types::magneto;
-			mag_z: in data port lab3::types::magneto;
-			rate_x: in data port lab3::types::angularRate;
-			rate_y: in data port lab3::types::angularRate;
-			rate_z: in data port lab3::types::angularRate;
-			st_rot_x: in data port lab3::types::radians;
-			st_rot_y: in data port lab3::types::radians;
-			st_rot_z: in data port lab3::types::radians;
+			es_rot: in data port lab3::types::orientation;
+			mag: in data port lab3::types::orientation;
+			rate: in data port lab3::types::angular_rate;
+			st_rot: in data port lab3::types::orientation;
 			
 			telecommand: in data port lab3::types::telecommandString;
 			
-			tor_x: out data port lab3::types::torque;
-			tor_y: out data port lab3::types::torque;
-			tor_z: out data port lab3::types::torque;
+			tor: out data port lab3::types::torque;
 	end attitudeController;
 	
 	thread fuseOrientation
 		features
-			fss_rot_x: in data port lab3::types::radians;
-			fss_rot_y: in data port lab3::types::radians;
-			fss_rot_z: in data port lab3::types::radians;
-			css_rot_x: in data port lab3::types::radians;
-			css_rot_y: in data port lab3::types::radians;
-			css_rot_z: in data port lab3::types::radians;
+			fss_rot: in data port lab3::types::orientation;
+			css_rot: in data port lab3::types::orientation;
 			sps_present: in data port lab3::types::sunExist;
-			es_rot_x: in data port lab3::types::radians;
-			es_rot_y: in data port lab3::types::radians;
-			es_rot_z: in data port lab3::types::radians;
-			mag_x: in data port lab3::types::magneto;
-			mag_y: in data port lab3::types::magneto;
-			mag_z: in data port lab3::types::magneto;
-			rate_x: in data port lab3::types::angularRate;
-			rate_y: in data port lab3::types::angularRate;
-			rate_z: in data port lab3::types::angularRate;
-			st_rot_x: in data port lab3::types::radians;
-			st_rot_y: in data port lab3::types::radians;
-			st_rot_z: in data port lab3::types::radians;
+			es_rot: in data port lab3::types::orientation;
+			mag: in data port lab3::types::orientation;
+			rate: in data port lab3::types::angular_rate;
+			st_rot: in data port lab3::types::orientation;
 			
 			telecommand: in data port lab3::types::telecommandString;
 			
-			des_orient_x: out data port lab3::types::radians;
-			des_orient_y: out data port lab3::types::radians;
-			des_orient_z: out data port lab3::types::radians;
+			des_orient: out data port lab3::types::orientation;
 	end fuseOrientation;
 	
 	thread implementation fuseOrientation.impl
@@ -72,13 +44,9 @@ public
 	
 	thread attitudeControlThread
 		features
-			des_orient_x: in data port lab3::types::radians;
-			des_orient_y: in data port lab3::types::radians;
-			des_orient_z: in data port lab3::types::radians;
+			des_orient: in data port lab3::types::orientation;
 			
-			tor_x: out data port lab3::types::torque;
-			tor_y: out data port lab3::types::torque;
-			tor_z: out data port lab3::types::torque;
+			tor: out data port lab3::types::torque;
 	end attitudeControlThread;
 	
 	thread implementation attitudeControlThread.impl
@@ -92,82 +60,54 @@ public
 			fusion_worker: thread fuseOrientation;
 			act_worker: thread attitudeControlThread;
 		connections
-			fss_x: port fss_rot_x -> fusion_worker.fss_rot_x;
-			fss_y: port fss_rot_y -> fusion_worker.fss_rot_y;
-			fss_z: port fss_rot_z -> fusion_worker.fss_rot_z;
+			fss_con: port fss_rot -> fusion_worker.fss_rot;
 			
-			css_x: port css_rot_x -> fusion_worker.css_rot_x;
-			css_y: port css_rot_y -> fusion_worker.css_rot_y;
-			css_z: port css_rot_z -> fusion_worker.css_rot_z;
+			css_con: port css_rot -> fusion_worker.css_rot;
 			
-			sps: port sps_present -> fusion_worker.sps_present;
+			sps_con: port sps_present -> fusion_worker.sps_present;
 			
-			es_x: port es_rot_x -> fusion_worker.es_rot_x;
-			es_y: port es_rot_y -> fusion_worker.es_rot_y;
-			es_z: port es_rot_z -> fusion_worker.es_rot_z;
+			es_con: port es_rot -> fusion_worker.es_rot;
 			
-			magx: port mag_x -> fusion_worker.mag_x;
-			magy: port mag_y -> fusion_worker.mag_y;
-			magz: port mag_z -> fusion_worker.mag_z;
+			mag_con: port mag -> fusion_worker.mag;
 			
-			ratex: port rate_x -> fusion_worker.rate_x;
-			ratey: port rate_y -> fusion_worker.rate_y;
-			ratez: port rate_z -> fusion_worker.rate_z;
+			rate_con: port rate -> fusion_worker.rate;
 			
-			st_x: port st_rot_x -> fusion_worker.st_rot_x;
-			st_y: port st_rot_y -> fusion_worker.st_rot_y;
-			st_z: port st_rot_z -> fusion_worker.st_rot_z;
+			st_con: port st_rot -> fusion_worker.st_rot;
 			
 			-- the attitude controller receives the telecommand string as well
 			-- in case there are any specific orientation requirements
 			telecommand_con: port telecommand -> fusion_worker.telecommand;
 			
 			
-			des_x: port fusion_worker.des_orient_x -> act_worker.des_orient_x;
-			des_y: port fusion_worker.des_orient_y -> act_worker.des_orient_y;
-			des_z: port fusion_worker.des_orient_z -> act_worker.des_orient_z;
+			des_con: port fusion_worker.des_orient -> act_worker.des_orient;
 			
-			tx: port act_worker.tor_x -> tor_x;
-			ty: port act_worker.tor_y -> tor_y;
-			tz: port act_worker.tor_z -> tor_z;
+			tor_con: port act_worker.tor -> tor;
 	end attitudeController.impl;
 	
 	
 	-- process and thread for controlling the orbit (with implementations)
 	process orbitController
 		features
-			gps_long: in data port lab3::types::position;
-			gps_lat: in data port lab3::types::position;
-			gps_el: in data port lab3::types::position;
+			gps_pos: in data port lab3::types::position;
 			gps_time: in data port lab3::types::gpsTimeStamp;
 			
-			st_rot_x: in data port lab3::types::radians;
-			st_rot_y: in data port lab3::types::radians;
-			st_rot_z: in data port lab3::types::radians;
+			st_rot: in data port lab3::types::orientation;
 			
 			telecommand: in data port lab3::types::telecommandString;
 			
-			dV_x: out data port lab3::types::deltaV;
-			dV_y: out data port lab3::types::deltaV;
-			dV_z: out data port lab3::types::deltaV;
+			dV: out data port lab3::types::delta_v;
 	end orbitController;
 	
 	thread orbitControlThread
 		features
-			gps_long: in data port lab3::types::position;
-			gps_lat: in data port lab3::types::position;
-			gps_el: in data port lab3::types::position;
+			gps_pos: in data port lab3::types::position;
 			gps_time: in data port lab3::types::gpsTimeStamp;
 			
-			st_rot_x: in data port lab3::types::radians;
-			st_rot_y: in data port lab3::types::radians;
-			st_rot_z: in data port lab3::types::radians;
+			st_rot: in data port lab3::types::orientation;
 			
 			telecommand: in data port lab3::types::telecommandString;
 			
-			dV_x: out data port lab3::types::deltaV;
-			dV_y: out data port lab3::types::deltaV;
-			dV_z: out data port lab3::types::deltaV;
+			dV: out data port lab3::types::delta_v;
 	end orbitControlThread;
 	
 	thread implementation orbitControlThread.impl
@@ -180,20 +120,14 @@ public
 		subcomponents
 			orbit_worker: thread orbitControlThread;
 		connections
-			gps_long_con: port gps_long -> orbit_worker.gps_long;
-			gps_lat_con: port gps_lat -> orbit_worker.gps_lat;
-			gps_el_con: port gps_el -> orbit_worker.gps_el;
+			gps_long_con: port gps_pos -> orbit_worker.gps_pos;
 			gps_time_con: port gps_time -> orbit_worker.gps_time;
 			
-			st_x: port st_rot_x -> orbit_worker.st_rot_x;
-			st_y: port st_rot_y -> orbit_worker.st_rot_y;
-			st_z: port st_rot_z -> orbit_worker.st_rot_z;
+			st_x: port st_rot -> orbit_worker.st_rot;
 			
 			mission_mode_in: port telecommand -> orbit_worker.telecommand;
 			
-			dv_x_in: port orbit_worker.dV_x -> dV_x;
-			dv_y_in: port orbit_worker.dV_y -> dV_y;
-			dv_z_in: port orbit_worker.dV_z -> dV_z;
+			dv_x_in: port orbit_worker.dV -> dV;
 	end orbitController.impl;
 	
 	
@@ -204,35 +138,21 @@ public
 	process AocsReconfiguration
 		features
 			-- inputs of the process
-			fss_rot_x: in data port lab3::types::radians;
-			fss_rot_y: in data port lab3::types::radians;
-			fss_rot_z: in data port lab3::types::radians;
+			fss_rot: in data port lab3::types::orientation;
 			
-			css_rot_x: in data port lab3::types::radians;
-			css_rot_y: in data port lab3::types::radians;
-			css_rot_z: in data port lab3::types::radians;
+			css_rot: in data port lab3::types::orientation;
 			
 			sps_present: in data port lab3::types::sunExist;
 			
-			es_rot_x: in data port lab3::types::radians;
-			es_rot_y: in data port lab3::types::radians;
-			es_rot_z: in data port lab3::types::radians;
+			es_rot: in data port lab3::types::orientation;
 			
-			mag_x: in data port lab3::types::magneto;
-			mag_y: in data port lab3::types::magneto;
-			mag_z: in data port lab3::types::magneto;
+			mag: in data port lab3::types::orientation;
 			
-			rate_x: in data port lab3::types::angularRate;
-			rate_y: in data port lab3::types::angularRate;
-			rate_z: in data port lab3::types::angularRate;
+			rate: in data port lab3::types::angular_rate;
 			
-			st_rot_x: in data port lab3::types::radians;
-			st_rot_y: in data port lab3::types::radians;
-			st_rot_z: in data port lab3::types::radians;
+			st_rot: in data port lab3::types::orientation;
 			
-			gps_long: in data port lab3::types::position;
-			gps_lat: in data port lab3::types::position;
-			gps_el: in data port lab3::types::position;
+			gps_pos: in data port lab3::types::position;
 			gps_time: in data port lab3::types::gpsTimeStamp;
 			
 			telecommand: in data port lab3::types::telecommandString;
@@ -254,35 +174,21 @@ public
 	thread AocsReconfigurationThread
 		features
 		-- inputs of the thread
-			fss_rot_x: in data port lab3::types::radians;
-			fss_rot_y: in data port lab3::types::radians;
-			fss_rot_z: in data port lab3::types::radians;
+			fss_rot: in data port lab3::types::orientation;
 			
-			css_rot_x: in data port lab3::types::radians;
-			css_rot_y: in data port lab3::types::radians;
-			css_rot_z: in data port lab3::types::radians;
+			css_rot: in data port lab3::types::orientation;
 			
 			sps_present: in data port lab3::types::sunExist;
 			
-			es_rot_x: in data port lab3::types::radians;
-			es_rot_y: in data port lab3::types::radians;
-			es_rot_z: in data port lab3::types::radians;
+			es_rot: in data port lab3::types::orientation;
 			
-			mag_x: in data port lab3::types::magneto;
-			mag_y: in data port lab3::types::magneto;
-			mag_z: in data port lab3::types::magneto;
+			mag: in data port lab3::types::orientation;
 			
-			rate_x: in data port lab3::types::angularRate;
-			rate_y: in data port lab3::types::angularRate;
-			rate_z: in data port lab3::types::angularRate;
+			rate: in data port lab3::types::angular_rate;
 			
-			st_rot_x: in data port lab3::types::radians;
-			st_rot_y: in data port lab3::types::radians;
-			st_rot_z: in data port lab3::types::radians;
+			st_rot: in data port lab3::types::orientation;
 			
-			gps_long: in data port lab3::types::position;
-			gps_lat: in data port lab3::types::position;
-			gps_el: in data port lab3::types::position;
+			gps_pos: in data port lab3::types::position;
 			gps_time: in data port lab3::types::gpsTimeStamp;
 			
 			telecommand: in data port lab3::types::telecommandString;
@@ -311,35 +217,21 @@ public
 			worker: thread AocsReconfigurationThread;
 		connections
 			-- inputs connections
-			fss_x: port fss_rot_x -> worker.fss_rot_x;
-			fss_y: port fss_rot_y -> worker.fss_rot_y;
-			fss_z: port fss_rot_z -> worker.fss_rot_z;
+			fss_x: port fss_rot -> worker.fss_rot;
 			
-			css_x: port css_rot_x -> worker.css_rot_x;
-			css_y: port css_rot_y -> worker.css_rot_y;
-			css_z: port css_rot_z -> worker.css_rot_z;
+			css_x: port css_rot -> worker.css_rot;
 			
 			sps: port sps_present -> worker.sps_present;
 			
-			es_x: port es_rot_x -> worker.es_rot_x;
-			es_y: port es_rot_y -> worker.es_rot_y;
-			es_z: port es_rot_z -> worker.es_rot_z;
+			es_x: port es_rot -> worker.es_rot;
 			
-			magx: port mag_x -> worker.mag_x;
-			magy: port mag_y -> worker.mag_y;
-			magz: port mag_z -> worker.mag_z;
+			magx: port mag -> worker.mag;
 			
-			ratex: port rate_x -> worker.rate_x;
-			ratey: port rate_y -> worker.rate_y;
-			ratez: port rate_z -> worker.rate_z;
+			rate_con: port rate -> worker.rate;
 			
-			st_x: port st_rot_x -> worker.st_rot_x;
-			st_y: port st_rot_y -> worker.st_rot_y;
-			st_z: port st_rot_z -> worker.st_rot_z;
+			st_x: port st_rot -> worker.st_rot;
 			
-			gps_long_con: port gps_long -> worker.gps_long;
-			gps_lat_con: port gps_lat -> worker.gps_lat;
-			gps_el_con: port gps_el -> worker.gps_el;
+			gps_pos_con: port gps_pos -> worker.gps_pos;
 			gps_time_con: port gps_time -> worker.gps_time;
 	
 			telecommand_con: port telecommand -> worker.telecommand;
@@ -363,35 +255,21 @@ public
 	process sendTelemetry
 		features
 			-- inputs of the process
-			fss_rot_x: in data port lab3::types::radians;
-			fss_rot_y: in data port lab3::types::radians;
-			fss_rot_z: in data port lab3::types::radians;
+			fss_rot: in data port lab3::types::orientation;
 			
-			css_rot_x: in data port lab3::types::radians;
-			css_rot_y: in data port lab3::types::radians;
-			css_rot_z: in data port lab3::types::radians;
+			css_rot: in data port lab3::types::orientation;
 			
 			sps_present: in data port lab3::types::sunExist;
 			
-			es_rot_x: in data port lab3::types::radians;
-			es_rot_y: in data port lab3::types::radians;
-			es_rot_z: in data port lab3::types::radians;
+			es_rot: in data port lab3::types::orientation;
 			
-			mag_x: in data port lab3::types::magneto;
-			mag_y: in data port lab3::types::magneto;
-			mag_z: in data port lab3::types::magneto;
+			mag: in data port lab3::types::orientation;
 			
-			rate_x: in data port lab3::types::angularRate;
-			rate_y: in data port lab3::types::angularRate;
-			rate_z: in data port lab3::types::angularRate;
+			rate: in data port lab3::types::angular_rate;
 			
-			st_rot_x: in data port lab3::types::radians;
-			st_rot_y: in data port lab3::types::radians;
-			st_rot_z: in data port lab3::types::radians;
+			st_rot: in data port lab3::types::orientation;
 			
-			gps_long: in data port lab3::types::position;
-			gps_lat: in data port lab3::types::position;
-			gps_el: in data port lab3::types::position;
+			gps_pos: in data port lab3::types::position;
 			gps_time: in data port lab3::types::gpsTimeStamp;
 			
 			telemtryMessage: out data port lab3::types::telemetryString;
@@ -401,35 +279,21 @@ public
 	thread sendTelemetryThread
 		features
 			-- inputs of the process
-			fss_rot_x: in data port lab3::types::radians;
-			fss_rot_y: in data port lab3::types::radians;
-			fss_rot_z: in data port lab3::types::radians;
+			fss_rot: in data port lab3::types::orientation;
 			
-			css_rot_x: in data port lab3::types::radians;
-			css_rot_y: in data port lab3::types::radians;
-			css_rot_z: in data port lab3::types::radians;
+			css_rot: in data port lab3::types::orientation;
 			
 			sps_present: in data port lab3::types::sunExist;
 			
-			es_rot_x: in data port lab3::types::radians;
-			es_rot_y: in data port lab3::types::radians;
-			es_rot_z: in data port lab3::types::radians;
+			es_rot: in data port lab3::types::orientation;
 			
-			mag_x: in data port lab3::types::magneto;
-			mag_y: in data port lab3::types::magneto;
-			mag_z: in data port lab3::types::magneto;
+			mag: in data port lab3::types::orientation;
 			
-			rate_x: in data port lab3::types::angularRate;
-			rate_y: in data port lab3::types::angularRate;
-			rate_z: in data port lab3::types::angularRate;
+			rate: in data port lab3::types::angular_rate;
 			
-			st_rot_x: in data port lab3::types::radians;
-			st_rot_y: in data port lab3::types::radians;
-			st_rot_z: in data port lab3::types::radians;
+			st_rot: in data port lab3::types::orientation;
 			
-			gps_long: in data port lab3::types::position;
-			gps_lat: in data port lab3::types::position;
-			gps_el: in data port lab3::types::position;
+			gps_pos: in data port lab3::types::position;
 			gps_time: in data port lab3::types::gpsTimeStamp;
 			
 			telemtryMessage: out data port lab3::types::telemetryString;
@@ -446,35 +310,21 @@ public
 		subcomponents
 			worker: thread sendTelemetryThread;
 		connections
-			fss_x: port fss_rot_x -> worker.fss_rot_x;
-			fss_y: port fss_rot_y -> worker.fss_rot_y;
-			fss_z: port fss_rot_z -> worker.fss_rot_z;
+			fss_x: port fss_rot -> worker.fss_rot;
 			
-			css_x: port css_rot_x -> worker.css_rot_x;
-			css_y: port css_rot_y -> worker.css_rot_y;
-			css_z: port css_rot_z -> worker.css_rot_z;
+			css_x: port css_rot -> worker.css_rot;
 			
 			sps: port sps_present -> worker.sps_present;
 			
-			es_x: port es_rot_x -> worker.es_rot_x;
-			es_y: port es_rot_y -> worker.es_rot_y;
-			es_z: port es_rot_z -> worker.es_rot_z;
+			es_x: port es_rot -> worker.es_rot;
 			
-			magx: port mag_x -> worker.mag_x;
-			magy: port mag_y -> worker.mag_y;
-			magz: port mag_z -> worker.mag_z;
+			magx: port mag -> worker.mag;
 			
-			ratex: port rate_x -> worker.rate_x;
-			ratey: port rate_y -> worker.rate_y;
-			ratez: port rate_z -> worker.rate_z;
+			ratex: port rate -> worker.rate;
 			
-			st_x: port st_rot_x -> worker.st_rot_x;
-			st_y: port st_rot_y -> worker.st_rot_y;
-			st_z: port st_rot_z -> worker.st_rot_z;
+			st_x: port st_rot -> worker.st_rot;
 			
-			gps_long_con: port gps_long -> worker.gps_long;
-			gps_lat_con: port gps_lat -> worker.gps_lat;
-			gps_el_con: port gps_el -> worker.gps_el;
+			gps_pos_con: port gps_pos -> worker.gps_pos;
 			gps_time_con: port gps_time -> worker.gps_time;
 			
 			telemetry_con: port worker.telemtryMessage -> telemtryMessage;

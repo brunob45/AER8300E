@@ -99,105 +99,69 @@ public
 			
 			-- //////////// SENSOR-DEVICE CONNECTION FOR MAIN SYSTEM \\\\\\\\\\\\\
 			-- sensor connections to cpu (sens data + activation signal)
-			fss_x: port fss_sens.fss_rot_x -> aocs_cpu.fss_rot_x_in;
-			fss_y: port fss_sens.fss_rot_y -> aocs_cpu.fss_rot_y_in;
-			fss_z: port fss_sens.fss_rot_z -> aocs_cpu.fss_rot_z_in;
-			fss_active: port aocs_cpu.fss_activate_out -> fss_sens.fss_activate;
+			fss_x: port fss_sens.rot -> aocs_cpu.fss_rot_in;
+			fss_active: port aocs_cpu.fss_activate_out -> fss_sens.activate;
 			
-			css_x: port css_sens.css_rot_x -> aocs_cpu.css_rot_x_in;
-			css_y: port css_sens.css_rot_y -> aocs_cpu.css_rot_y_in;
-			css_z: port css_sens.css_rot_z -> aocs_cpu.css_rot_z_in;
-			css_active: port aocs_cpu.css_activate_out -> css_sens.css_activate;
+			css_x: port css_sens.rot -> aocs_cpu.css_rot_in;
+			css_active: port aocs_cpu.css_activate_out -> css_sens.activate;
 			
 			sps: port sps_sens.is_present -> aocs_cpu.sps_present_in;
-			sps_active: port aocs_cpu.sps_activate_out -> sps_sens.sps_activate;
+			sps_active: port aocs_cpu.sps_activate_out -> sps_sens.activate;
 			
-			es_x: port es_sens.es_rot_x -> aocs_cpu.es_rot_x_in;
-			es_y: port es_sens.es_rot_y -> aocs_cpu.es_rot_y_in;
-			es_z: port es_sens.es_rot_z -> aocs_cpu.es_rot_z_in;
-			es_active: port aocs_cpu.es_activate_out -> es_sens.es_activate;
+			es_x: port es_sens.rot -> aocs_cpu.es_rot_in;
+			es_active: port aocs_cpu.es_activate_out -> es_sens.activate;
 			
-			magx: port mag_sens.mag_x -> aocs_cpu.mag_x_in;
-			magy: port mag_sens.mag_y -> aocs_cpu.mag_y_in;
-			magz: port mag_sens.mag_z -> aocs_cpu.mag_z_in;
-			mag_active: port aocs_cpu.mag_activate_out -> mag_sens.mag_activate;
+			magx: port mag_sens.rot -> aocs_cpu.mag_in;
+			mag_active: port aocs_cpu.mag_activate_out -> mag_sens.activate;
 			
-			ratex: port gyro_sens.rate_x -> aocs_cpu.rate_x_in;
-			ratey: port gyro_sens.rate_y -> aocs_cpu.rate_y_in;
-			ratez: port gyro_sens.rate_z -> aocs_cpu.rate_z_in;
-			gyro_active: port aocs_cpu.rate_activate_out -> gyro_sens.rate_activate;
+			ratex: port gyro_sens.rate -> aocs_cpu.rate_in;
+			gyro_active: port aocs_cpu.rate_activate_out -> gyro_sens.activate;
 			
-			st_x: port st_sens.st_rot_x -> aocs_cpu.st_rot_x_in;
-			st_y: port st_sens.st_rot_y -> aocs_cpu.st_rot_y_in;
-			st_z: port st_sens.st_rot_z -> aocs_cpu.st_rot_z_in;
-			st_active: port aocs_cpu.st_activate_out -> st_sens.st_activate;
+			st_x: port st_sens.rot -> aocs_cpu.st_rot_in;
+			st_active: port aocs_cpu.st_activate_out -> st_sens.activate;
 			
-			gps_long_con: port gps_sens.long -> aocs_cpu.gps_long_in;
-			gps_lat_con: port gps_sens.lat -> aocs_cpu.gps_lat_in;
-			gps_el_con: port gps_sens.el -> aocs_cpu.gps_el_in;
+			gps_long_con: port gps_sens.pos -> aocs_cpu.gps_pos_in;
 			gps_time_con: port gps_sens.time -> aocs_cpu.gps_time_in;
 			gps_active: port aocs_cpu.gps_activate_out -> gps_sens.gps_activate;
 			
 			-- actuator connections to cpu
-			tor_x_con: port aocs_cpu.tor_x_out -> inertia_wheel.tor_x;
-			tor_y_con: port aocs_cpu.tor_y_out -> inertia_wheel.tor_y;
-			tor_z_con: port aocs_cpu.tor_z_out -> inertia_wheel.tor_z;
+			tor_x_con: port aocs_cpu.tor_out -> inertia_wheel.tor;
 			
-			dV_x_con: port aocs_cpu.dV_x_out -> thruster.dV_x;
-			dV_y_con: port aocs_cpu.dV_y_out -> thruster.dV_y;
-			dV_z_con: port aocs_cpu.dV_z_out -> thruster.dV_z;
+			dV_x_con: port aocs_cpu.dV_out -> thruster.dV;
 			
 			
 			
 			--  ///////////////// SENSOR-DEVICE CONNECTIONS FOR RDUNDANT SYSTEM \\\\\\\\\\
 			-- sensor connections to cpu (sens data + activation signal)
-			fss_x_r: port fss_sens_r.fss_rot_x -> aocs_cpu_r.fss_rot_x_in;
-			fss_y_r: port fss_sens_r.fss_rot_y -> aocs_cpu_r.fss_rot_y_in;
-			fss_z_r: port fss_sens_r.fss_rot_z -> aocs_cpu_r.fss_rot_z_in;
-			fss_active_r: port aocs_cpu_r.fss_activate_out -> fss_sens_r.fss_activate;
+			fss_x_r: port fss_sens_r.rot -> aocs_cpu_r.fss_rot_in;
+			fss_active_r: port aocs_cpu_r.fss_activate_out -> fss_sens_r.activate;
 			
-			css_x_r: port css_sens_r.css_rot_x -> aocs_cpu_r.css_rot_x_in;
-			css_y_r: port css_sens_r.css_rot_y -> aocs_cpu_r.css_rot_y_in;
-			css_z_r: port css_sens_r.css_rot_z -> aocs_cpu_r.css_rot_z_in;
-			css_active_r: port aocs_cpu_r.css_activate_out -> css_sens_r.css_activate;
+			css_x_r: port css_sens_r.rot -> aocs_cpu_r.css_rot_in;
+			css_active_r: port aocs_cpu_r.css_activate_out -> css_sens_r.activate;
 			
 			sps_r: port sps_sens_r.is_present -> aocs_cpu_r.sps_present_in;
-			sps_active_r: port aocs_cpu_r.sps_activate_out -> sps_sens_r.sps_activate;
+			sps_active_r: port aocs_cpu_r.sps_activate_out -> sps_sens_r.activate;
 			
-			es_x_r: port es_sens_r.es_rot_x -> aocs_cpu_r.es_rot_x_in;
-			es_y_r: port es_sens_r.es_rot_y -> aocs_cpu_r.es_rot_y_in;
-			es_z_r: port es_sens_r.es_rot_z -> aocs_cpu_r.es_rot_z_in;
-			es_active_r: port aocs_cpu_r.es_activate_out -> es_sens_r.es_activate;
+			es_x_r: port es_sens_r.rot -> aocs_cpu_r.es_rot_in;
+			es_active_r: port aocs_cpu_r.es_activate_out -> es_sens_r.activate;
 			
-			magx_r: port mag_sens_r.mag_x -> aocs_cpu_r.mag_x_in;
-			magy_r: port mag_sens_r.mag_y -> aocs_cpu_r.mag_y_in;
-			magz_r: port mag_sens_r.mag_z -> aocs_cpu_r.mag_z_in;
-			mag_active_r: port aocs_cpu_r.mag_activate_out -> mag_sens_r.mag_activate;
+			magx_r: port mag_sens_r.rot -> aocs_cpu_r.mag_in;
+			mag_active_r: port aocs_cpu_r.mag_activate_out -> mag_sens_r.activate;
 			
-			ratex_r: port gyro_sens_r.rate_x -> aocs_cpu_r.rate_x_in;
-			ratey_r: port gyro_sens_r.rate_y -> aocs_cpu_r.rate_y_in;
-			ratez_r: port gyro_sens_r.rate_z -> aocs_cpu_r.rate_z_in;
-			gyro_active_r: port aocs_cpu_r.rate_activate_out -> gyro_sens_r.rate_activate;
+			ratex_r: port gyro_sens_r.rate -> aocs_cpu_r.rate_in;
+			gyro_active_r: port aocs_cpu_r.rate_activate_out -> gyro_sens_r.activate;
 			
-			st_x_r: port st_sens_r.st_rot_x -> aocs_cpu_r.st_rot_x_in;
-			st_y_r: port st_sens_r.st_rot_y -> aocs_cpu_r.st_rot_y_in;
-			st_z_r: port st_sens_r.st_rot_z -> aocs_cpu_r.st_rot_z_in;
-			st_active_r: port aocs_cpu_r.st_activate_out -> st_sens_r.st_activate;
+			st_x_r: port st_sens_r.rot -> aocs_cpu_r.st_rot_in;
+			st_active_r: port aocs_cpu_r.st_activate_out -> st_sens_r.activate;
 			
-			gps_long_con_r: port gps_sens_r.long -> aocs_cpu_r.gps_long_in;
-			gps_lat_con_r: port gps_sens_r.lat -> aocs_cpu_r.gps_lat_in;
-			gps_el_con_r: port gps_sens_r.el -> aocs_cpu_r.gps_el_in;
+			gps_long_con_r: port gps_sens_r.pos -> aocs_cpu_r.gps_pos_in;
 			gps_time_con_r: port gps_sens_r.time -> aocs_cpu_r.gps_time_in;
 			gps_active_r: port aocs_cpu_r.gps_activate_out -> gps_sens_r.gps_activate;
 			
 			-- actuator connections to redundant cpu (redundant computer to same actuators)
-			tor_x_con_r: port aocs_cpu_r.tor_x_out -> inertia_wheel.tor_x;
-			tor_y_con_r: port aocs_cpu_r.tor_y_out -> inertia_wheel.tor_y;
-			tor_z_con_r: port aocs_cpu_r.tor_z_out -> inertia_wheel.tor_z;
+			tor_x_con_r: port aocs_cpu_r.tor_out -> inertia_wheel.tor;
 			
-			dV_x_con_r: port aocs_cpu_r.dV_x_out -> thruster.dV_x;
-			dV_y_con_r: port aocs_cpu_r.dV_y_out -> thruster.dV_y;
-			dV_z_con_r: port aocs_cpu_r.dV_z_out -> thruster.dV_z;
+			dV_x_con_r: port aocs_cpu_r.dV_out -> thruster.dV;
 			
 			
 			
@@ -228,92 +192,58 @@ public
 			
 			--------------------------------- attitudeController process
 			-- 1) from aocs_cpu to process
-			cpu_fss_x: port aocs_cpu.fss_rot_x_out -> attitude_cont.fss_rot_x;
-			cpu_fss_y: port aocs_cpu.fss_rot_y_out -> attitude_cont.fss_rot_y;
-			cpu_fss_z: port aocs_cpu.fss_rot_z_out -> attitude_cont.fss_rot_z;
+			cpu_fss_x: port aocs_cpu.fss_rot_out -> attitude_cont.fss_rot;
 			
-			cpu_css_x: port aocs_cpu.css_rot_x_out -> attitude_cont.css_rot_x;
-			cpu_css_y: port aocs_cpu.css_rot_y_out -> attitude_cont.css_rot_y;
-			cpu_css_z: port aocs_cpu.css_rot_z_out -> attitude_cont.css_rot_z;
+			cpu_css_x: port aocs_cpu.css_rot_out -> attitude_cont.css_rot;
 			
 			cpu_sps: port aocs_cpu.sps_present_out -> attitude_cont.sps_present;
 			
-			cpu_es_x: port aocs_cpu.es_rot_x_out -> attitude_cont.es_rot_x;
-			cpu_es_y: port aocs_cpu.es_rot_y_out -> attitude_cont.es_rot_y;
-			cpu_es_z: port aocs_cpu.es_rot_z_out -> attitude_cont.es_rot_z;
+			cpu_es_x: port aocs_cpu.es_rot_out -> attitude_cont.es_rot;
 			
-			cpu_mag_x: port aocs_cpu.mag_x_out -> attitude_cont.mag_x;
-			cpu_mag_y: port aocs_cpu.mag_y_out -> attitude_cont.mag_y;
-			cpu_mag_z: port aocs_cpu.mag_z_out -> attitude_cont.mag_z;
+			cpu_mag_x: port aocs_cpu.mag_out -> attitude_cont.mag;
 			
-			cpu_gyro_x: port aocs_cpu.rate_x_out -> attitude_cont.rate_x;
-			cpu_gyro_y: port aocs_cpu.rate_y_out -> attitude_cont.rate_y;
-			cpu_gyro_z: port aocs_cpu.rate_z_out -> attitude_cont.rate_z;
+			cpu_gyro_x: port aocs_cpu.rate_out -> attitude_cont.rate;
 			
-			cpu_st_x: port aocs_cpu.st_rot_x_out -> attitude_cont.st_rot_x;
-			cpu_st_y: port aocs_cpu.st_rot_y_out -> attitude_cont.st_rot_y;
-			cpu_st_z: port aocs_cpu.st_rot_z_out -> attitude_cont.st_rot_z;
+			cpu_st_x: port aocs_cpu.st_rot_out -> attitude_cont.st_rot;
 			
 			cpu_telecommand_att: port aocs_cpu.telecommand_out -> attitude_cont.telecommand;
 			
 			-- 2) output from process to computer
-			att_cpu_tor_x: port attitude_cont.tor_x -> aocs_cpu.tor_x_in;
-			att_cpu_tor_y: port attitude_cont.tor_x -> aocs_cpu.tor_y_in; 
-			att_cpu_tor_z: port attitude_cont.tor_x -> aocs_cpu.tor_z_in; 
+			att_cpu_tor_x: port attitude_cont.tor -> aocs_cpu.tor_in; 
 			 
 			 
 			-- --------------------------------orbitController process
 			-- 1) from cpu to process
-			cpu_gps_long: port aocs_cpu.gps_long_out -> orbit_cont.gps_long;
-			cpu_gps_lat: port aocs_cpu.gps_lat_out -> orbit_cont.gps_lat;
-			cpu_gps_el: port aocs_cpu.gps_el_out -> orbit_cont.gps_el;
+			cpu_gps_long: port aocs_cpu.gps_pos_out -> orbit_cont.gps_pos;
 			cpu_gps_time: port aocs_cpu.gps_time_out -> orbit_cont.gps_time;
 			
-			cpu_st_x_orb: port aocs_cpu.st_rot_x_out -> orbit_cont.st_rot_x;
-			cpu_st_y_orb: port aocs_cpu.st_rot_y_out -> orbit_cont.st_rot_y;
-			cpu_st_z_orb: port aocs_cpu.st_rot_z_out -> orbit_cont.st_rot_z;
+			cpu_st_x_orb: port aocs_cpu.st_rot_out -> orbit_cont.st_rot;
 			
 			cpu_telecommand_orb: port aocs_cpu.telecommand_out -> orbit_cont.telecommand;
 			
 			-- 2) output from process to cpu
-			orb_cpu_dV_x: port orbit_cont.dV_x -> aocs_cpu.dV_x_in;
-			orb_cpu_dV_y: port orbit_cont.dV_y -> aocs_cpu.dV_y_in;
-			orb_cpu_dV_z: port orbit_cont.dV_z -> aocs_cpu.dV_z_in;
+			orb_cpu_dV_x: port orbit_cont.dV -> aocs_cpu.dV_in;
 			
 			
 			
 			
 			----------------------------- AocsReconfiguration process
 			-- 1) from aocs_cpu to process
-			cpu_fss_x_reconfig: port aocs_cpu.fss_rot_x_out -> aocs_reconfig.fss_rot_x;
-			cpu_fss_y_reconfig: port aocs_cpu.fss_rot_y_out -> aocs_reconfig.fss_rot_y;
-			cpu_fss_z_reconfig: port aocs_cpu.fss_rot_z_out -> aocs_reconfig.fss_rot_z;
+			cpu_fss_x_reconfig: port aocs_cpu.fss_rot_out -> aocs_reconfig.fss_rot;
 			
-			cpu_css_x_reconfig: port aocs_cpu.css_rot_x_out -> aocs_reconfig.css_rot_x;
-			cpu_css_y_reconfig: port aocs_cpu.css_rot_y_out -> aocs_reconfig.css_rot_y;
-			cpu_css_z_reconfig: port aocs_cpu.css_rot_z_out -> aocs_reconfig.css_rot_z;
+			cpu_css_x_reconfig: port aocs_cpu.css_rot_out -> aocs_reconfig.css_rot;
 			
 			cpu_sps_reconfig: port aocs_cpu.sps_present_out -> aocs_reconfig.sps_present;
 			
-			cpu_es_x_reconfig: port aocs_cpu.es_rot_x_out -> aocs_reconfig.es_rot_x;
-			cpu_es_y_reconfig: port aocs_cpu.es_rot_y_out -> aocs_reconfig.es_rot_y;
-			cpu_es_z_reconfig: port aocs_cpu.es_rot_z_out -> aocs_reconfig.es_rot_z;
+			cpu_es_x_reconfig: port aocs_cpu.es_rot_out -> aocs_reconfig.es_rot;
 			
-			cpu_mag_x_reconfig: port aocs_cpu.mag_x_out -> aocs_reconfig.mag_x;
-			cpu_mag_y_reconfig: port aocs_cpu.mag_y_out -> aocs_reconfig.mag_y;
-			cpu_mag_z_reconfig: port aocs_cpu.mag_z_out -> aocs_reconfig.mag_z;
+			cpu_mag_x_reconfig: port aocs_cpu.mag_out -> aocs_reconfig.mag;
 			
-			cpu_gyro_x_reconfig: port aocs_cpu.rate_x_out -> aocs_reconfig.rate_x;
-			cpu_gyro_y_reconfig: port aocs_cpu.rate_y_out -> aocs_reconfig.rate_y;
-			cpu_gyro_z_reconfig: port aocs_cpu.rate_z_out -> aocs_reconfig.rate_z;
+			cpu_gyro_x_reconfig: port aocs_cpu.rate_out -> aocs_reconfig.rate;
 			
-			cpu_st_x_reconfig: port aocs_cpu.st_rot_x_out -> aocs_reconfig.st_rot_x;
-			cpu_st_y_reconfig: port aocs_cpu.st_rot_y_out -> aocs_reconfig.st_rot_y;
-			cpu_st_z_reconfig: port aocs_cpu.st_rot_z_out -> aocs_reconfig.st_rot_z;
+			cpu_st_x_reconfig: port aocs_cpu.st_rot_out -> aocs_reconfig.st_rot;
 			
-			cpu_gps_long_reconfig: port aocs_cpu.gps_long_out -> aocs_reconfig.gps_long;
-			cpu_gps_lat_reconfig: port aocs_cpu.gps_lat_out -> aocs_reconfig.gps_lat;
-			cpu_gps_el_reconfig: port aocs_cpu.gps_el_out -> aocs_reconfig.gps_el;
+			cpu_gps_long_reconfig: port aocs_cpu.gps_pos_out -> aocs_reconfig.gps_pos;
 			cpu_gps_time_reconfig: port aocs_cpu.gps_time_out -> aocs_reconfig.gps_time;
 			
 			cpu_telecommand_reconfig: port aocs_cpu.telecommand_out -> aocs_reconfig.telecommand;
@@ -333,35 +263,21 @@ public
 			
 			----------------------------- sendTelemetry process
 			-- 1) from aocs_cpu to process
-			cpu_fss_x_telem: port aocs_cpu.fss_rot_x_out -> send_telem.fss_rot_x;
-			cpu_fss_y_telem: port aocs_cpu.fss_rot_y_out -> send_telem.fss_rot_y;
-			cpu_fss_z_telem: port aocs_cpu.fss_rot_z_out -> send_telem.fss_rot_z;
+			cpu_fss_x_telem: port aocs_cpu.fss_rot_out -> send_telem.fss_rot;
 			
-			cpu_css_x_telem: port aocs_cpu.css_rot_x_out -> send_telem.css_rot_x;
-			cpu_css_y_telem: port aocs_cpu.css_rot_y_out -> send_telem.css_rot_y;
-			cpu_css_z_telem: port aocs_cpu.css_rot_z_out -> send_telem.css_rot_z;
+			cpu_css_x_telem: port aocs_cpu.css_rot_out -> send_telem.css_rot;
 			
 			cpu_sps_telem: port aocs_cpu.sps_present_out -> send_telem.sps_present;
 			
-			cpu_es_x_telem: port aocs_cpu.es_rot_x_out -> send_telem.es_rot_x;
-			cpu_es_y_telem: port aocs_cpu.es_rot_y_out -> send_telem.es_rot_y;
-			cpu_es_z_telem: port aocs_cpu.es_rot_z_out -> send_telem.es_rot_z;
+			cpu_es_x_telem: port aocs_cpu.es_rot_out -> send_telem.es_rot;
 			
-			cpu_mag_x_telem: port aocs_cpu.mag_x_out -> send_telem.mag_x;
-			cpu_mag_y_telem: port aocs_cpu.mag_y_out -> send_telem.mag_y;
-			cpu_mag_z_telem: port aocs_cpu.mag_z_out -> send_telem.mag_z;
+			cpu_mag_x_telem: port aocs_cpu.mag_out -> send_telem.mag;
 			
-			cpu_gyro_x_telem: port aocs_cpu.rate_x_out -> send_telem.rate_x;
-			cpu_gyro_y_telem: port aocs_cpu.rate_y_out -> send_telem.rate_y;
-			cpu_gyro_z_telem: port aocs_cpu.rate_z_out -> send_telem.rate_z;
+			cpu_gyro_x_telem: port aocs_cpu.rate_out -> send_telem.rate;
 			
-			cpu_st_x_telem: port aocs_cpu.st_rot_x_out -> send_telem.st_rot_x;
-			cpu_st_y_telem: port aocs_cpu.st_rot_y_out -> send_telem.st_rot_y;
-			cpu_st_z_telem: port aocs_cpu.st_rot_z_out -> send_telem.st_rot_z;
+			cpu_st_x_telem: port aocs_cpu.st_rot_out -> send_telem.st_rot;
 			
-			cpu_gps_long_telem: port aocs_cpu.gps_long_out -> send_telem.gps_long;
-			cpu_gps_lat_telem: port aocs_cpu.gps_lat_out -> send_telem.gps_lat;
-			cpu_gps_el_telem: port aocs_cpu.gps_el_out -> send_telem.gps_el;
+			cpu_gps_long_telem: port aocs_cpu.gps_pos_out -> send_telem.gps_pos;
 			cpu_gps_time_telem: port aocs_cpu.gps_time_out -> send_telem.gps_time;
 			
 			--2) sending output from the process to cpu
@@ -384,92 +300,58 @@ public
 			
 			---------------------Redundant attitudeController process
 			-- 1) from aocs_cpu to process
-			cpu_fss_x_r: port aocs_cpu_r.fss_rot_x_out -> attitude_cont_r.fss_rot_x;
-			cpu_fss_y_r: port aocs_cpu_r.fss_rot_y_out -> attitude_cont_r.fss_rot_y;
-			cpu_fss_z_r: port aocs_cpu_r.fss_rot_z_out -> attitude_cont_r.fss_rot_z;
+			cpu_fss_x_r: port aocs_cpu_r.fss_rot_out -> attitude_cont_r.fss_rot;
 			
-			cpu_css_x_r: port aocs_cpu_r.css_rot_x_out -> attitude_cont_r.css_rot_x;
-			cpu_css_y_r: port aocs_cpu_r.css_rot_y_out -> attitude_cont_r.css_rot_y;
-			cpu_css_z_r: port aocs_cpu_r.css_rot_z_out -> attitude_cont_r.css_rot_z;
+			cpu_css_x_r: port aocs_cpu_r.css_rot_out -> attitude_cont_r.css_rot;
 			
 			cpu_sps_r: port aocs_cpu_r.sps_present_out -> attitude_cont_r.sps_present;
 			
-			cpu_es_x_r: port aocs_cpu_r.es_rot_x_out -> attitude_cont_r.es_rot_x;
-			cpu_es_y_r: port aocs_cpu_r.es_rot_y_out -> attitude_cont_r.es_rot_y;
-			cpu_es_z_r: port aocs_cpu_r.es_rot_z_out -> attitude_cont_r.es_rot_z;
+			cpu_es_x_r: port aocs_cpu_r.es_rot_out -> attitude_cont_r.es_rot;
 			
-			cpu_mag_x_r: port aocs_cpu_r.mag_x_out -> attitude_cont_r.mag_x;
-			cpu_mag_y_r: port aocs_cpu_r.mag_y_out -> attitude_cont_r.mag_y;
-			cpu_mag_z_r: port aocs_cpu_r.mag_z_out -> attitude_cont_r.mag_z;
+			cpu_mag_x_r: port aocs_cpu_r.mag_out -> attitude_cont_r.mag;
 			
-			cpu_gyro_x_r: port aocs_cpu_r.rate_x_out -> attitude_cont_r.rate_x;
-			cpu_gyro_y_r: port aocs_cpu_r.rate_y_out -> attitude_cont_r.rate_y;
-			cpu_gyro_z_r: port aocs_cpu_r.rate_z_out -> attitude_cont_r.rate_z;
+			cpu_gyro_x_r: port aocs_cpu_r.rate_out -> attitude_cont_r.rate;
 			
-			cpu_st_x_r: port aocs_cpu_r.st_rot_x_out -> attitude_cont_r.st_rot_x;
-			cpu_st_y_r: port aocs_cpu_r.st_rot_y_out -> attitude_cont_r.st_rot_y;
-			cpu_st_z_r: port aocs_cpu_r.st_rot_z_out -> attitude_cont_r.st_rot_z;
+			cpu_st_x_r: port aocs_cpu_r.st_rot_out -> attitude_cont_r.st_rot;
 			
 			cpu_telecommand_att_r: port aocs_cpu_r.telecommand_out -> attitude_cont_r.telecommand;
 			
 			-- 2) output from process to computer
-			att_cpu_tor_x_r: port attitude_cont_r.tor_x -> aocs_cpu_r.tor_x_in;
-			att_cpu_tor_y_r: port attitude_cont_r.tor_x -> aocs_cpu_r.tor_y_in; 
-			att_cpu_tor_z_r: port attitude_cont_r.tor_x -> aocs_cpu_r.tor_z_in; 
+			att_cpu_tor_x_r: port attitude_cont_r.tor -> aocs_cpu_r.tor_in;
 			 
 			 
 			-- -----------------Redundant orbitController process
 			-- 1) from cpu to process
-			cpu_gps_long_r: port aocs_cpu_r.gps_long_out -> orbit_cont_r.gps_long;
-			cpu_gps_lat_r: port aocs_cpu_r.gps_lat_out -> orbit_cont_r.gps_lat;
-			cpu_gps_el_r: port aocs_cpu_r.gps_el_out -> orbit_cont_r.gps_el;
+			cpu_gps_long_r: port aocs_cpu_r.gps_pos_out -> orbit_cont_r.gps_pos;
 			cpu_gps_time_r: port aocs_cpu_r.gps_time_out -> orbit_cont_r.gps_time;
 			
-			cpu_st_x_orb_r: port aocs_cpu_r.st_rot_x_out -> orbit_cont_r.st_rot_x;
-			cpu_st_y_orb_r: port aocs_cpu_r.st_rot_y_out -> orbit_cont_r.st_rot_y;
-			cpu_st_z_orb_r: port aocs_cpu_r.st_rot_z_out -> orbit_cont_r.st_rot_z;
+			cpu_st_x_orb_r: port aocs_cpu_r.st_rot_out -> orbit_cont_r.st_rot;
 			
 			cpu_telecommand_orb_r: port aocs_cpu_r.telecommand_out -> orbit_cont_r.telecommand;
 			
 			-- 2) output from process to cpu
-			orb_cpu_dV_x_r: port orbit_cont_r.dV_x -> aocs_cpu_r.dV_x_in;
-			orb_cpu_dV_y_r: port orbit_cont_r.dV_y -> aocs_cpu_r.dV_y_in;
-			orb_cpu_dV_z_r: port orbit_cont_r.dV_z -> aocs_cpu_r.dV_z_in;
+			orb_cpu_dV_x_r: port orbit_cont_r.dV -> aocs_cpu_r.dV_in;
 			
 			
 			
 			
 			----------------------------- AocsReconfiguration process
 			-- 1) from aocs_cpu to process
-			cpu_fss_x_reconfig_r: port aocs_cpu_r.fss_rot_x_out -> aocs_reconfig_r.fss_rot_x;
-			cpu_fss_y_reconfig_r: port aocs_cpu_r.fss_rot_y_out -> aocs_reconfig_r.fss_rot_y;
-			cpu_fss_z_reconfig_r: port aocs_cpu_r.fss_rot_z_out -> aocs_reconfig_r.fss_rot_z;
+			cpu_fss_x_reconfig_r: port aocs_cpu_r.fss_rot_out -> aocs_reconfig_r.fss_rot;
 			
-			cpu_css_x_reconfig_r: port aocs_cpu_r.css_rot_x_out -> aocs_reconfig_r.css_rot_x;
-			cpu_css_y_reconfig_r: port aocs_cpu_r.css_rot_y_out -> aocs_reconfig_r.css_rot_y;
-			cpu_css_z_reconfig_r: port aocs_cpu_r.css_rot_z_out -> aocs_reconfig_r.css_rot_z;
+			cpu_css_x_reconfig_r: port aocs_cpu_r.css_rot_out -> aocs_reconfig_r.css_rot;
 			
 			cpu_sps_reconfig_r: port aocs_cpu_r.sps_present_out -> aocs_reconfig_r.sps_present;
 			
-			cpu_es_x_reconfig_r: port aocs_cpu_r.es_rot_x_out -> aocs_reconfig_r.es_rot_x;
-			cpu_es_y_reconfig_r: port aocs_cpu_r.es_rot_y_out -> aocs_reconfig_r.es_rot_y;
-			cpu_es_z_reconfig_r: port aocs_cpu_r.es_rot_z_out -> aocs_reconfig_r.es_rot_z;
+			cpu_es_x_reconfig_r: port aocs_cpu_r.es_rot_out -> aocs_reconfig_r.es_rot;
 			
-			cpu_mag_x_reconfig_r: port aocs_cpu_r.mag_x_out -> aocs_reconfig_r.mag_x;
-			cpu_mag_y_reconfig_r: port aocs_cpu_r.mag_y_out -> aocs_reconfig_r.mag_y;
-			cpu_mag_z_reconfig_r: port aocs_cpu_r.mag_z_out -> aocs_reconfig_r.mag_z;
+			cpu_mag_x_reconfig_r: port aocs_cpu_r.mag_out -> aocs_reconfig_r.mag;
 			
-			cpu_gyro_x_reconfig_r: port aocs_cpu_r.rate_x_out -> aocs_reconfig_r.rate_x;
-			cpu_gyro_y_reconfig_r: port aocs_cpu_r.rate_y_out -> aocs_reconfig_r.rate_y;
-			cpu_gyro_z_reconfig_r: port aocs_cpu_r.rate_z_out -> aocs_reconfig_r.rate_z;
+			cpu_gyro_x_reconfig_r: port aocs_cpu_r.rate_out -> aocs_reconfig_r.rate;
 			
-			cpu_st_x_reconfig_r: port aocs_cpu_r.st_rot_x_out -> aocs_reconfig_r.st_rot_x;
-			cpu_st_y_reconfig_r: port aocs_cpu_r.st_rot_y_out -> aocs_reconfig_r.st_rot_y;
-			cpu_st_z_reconfig_r: port aocs_cpu_r.st_rot_z_out -> aocs_reconfig_r.st_rot_z;
+			cpu_st_x_reconfig_r: port aocs_cpu_r.st_rot_out -> aocs_reconfig_r.st_rot;
 			
-			cpu_gps_long_reconfig_r: port aocs_cpu_r.gps_long_out -> aocs_reconfig_r.gps_long;
-			cpu_gps_lat_reconfig_r: port aocs_cpu_r.gps_lat_out -> aocs_reconfig_r.gps_lat;
-			cpu_gps_el_reconfig_r: port aocs_cpu_r.gps_el_out -> aocs_reconfig_r.gps_el;
+			cpu_gps_long_reconfig_r: port aocs_cpu_r.gps_pos_out -> aocs_reconfig_r.gps_pos;
 			cpu_gps_time_reconfig_r: port aocs_cpu_r.gps_time_out -> aocs_reconfig_r.gps_time;
 			
 			cpu_telecommand_reconfig_r: port aocs_cpu_r.telecommand_out -> aocs_reconfig_r.telecommand;
@@ -489,35 +371,20 @@ public
 			
 			----------------------------- sendTelemetry process
 			-- 1) from aocs_cpu to process
-			cpu_fss_x_telem_r: port aocs_cpu_r.fss_rot_x_out -> send_telem_r.fss_rot_x;
-			cpu_fss_y_telem_r: port aocs_cpu_r.fss_rot_y_out -> send_telem_r.fss_rot_y;
-			cpu_fss_z_telem_r: port aocs_cpu_r.fss_rot_z_out -> send_telem_r.fss_rot_z;
+			cpu_fss_x_telem_r: port aocs_cpu_r.fss_rot_out -> send_telem_r.fss_rot;
 			
-			cpu_css_x_telem_r: port aocs_cpu_r.css_rot_x_out -> send_telem_r.css_rot_x;
-			cpu_css_y_telem_r: port aocs_cpu_r.css_rot_y_out -> send_telem_r.css_rot_y;
-			cpu_css_z_telem_r: port aocs_cpu_r.css_rot_z_out -> send_telem_r.css_rot_z;
-			
+			cpu_css_x_telem_r: port aocs_cpu_r.css_rot_out -> send_telem_r.css_rot;
 			cpu_sps_telem_r: port aocs_cpu_r.sps_present_out -> send_telem_r.sps_present;
 			
-			cpu_es_x_telem_r: port aocs_cpu_r.es_rot_x_out -> send_telem_r.es_rot_x;
-			cpu_es_y_telem_r: port aocs_cpu_r.es_rot_y_out -> send_telem_r.es_rot_y;
-			cpu_es_z_telem_r: port aocs_cpu_r.es_rot_z_out -> send_telem_r.es_rot_z;
+			cpu_es_x_telem_r: port aocs_cpu_r.es_rot_out -> send_telem_r.es_rot;
 			
-			cpu_mag_x_telem_r: port aocs_cpu_r.mag_x_out -> send_telem_r.mag_x;
-			cpu_mag_y_telem_r: port aocs_cpu_r.mag_y_out -> send_telem_r.mag_y;
-			cpu_mag_z_telem_r: port aocs_cpu_r.mag_z_out -> send_telem_r.mag_z;
+			cpu_mag_x_telem_r: port aocs_cpu_r.mag_out -> send_telem_r.mag;
 			
-			cpu_gyro_x_telem_r: port aocs_cpu_r.rate_x_out -> send_telem_r.rate_x;
-			cpu_gyro_y_telem_r: port aocs_cpu_r.rate_y_out -> send_telem_r.rate_y;
-			cpu_gyro_z_telem_r: port aocs_cpu_r.rate_z_out -> send_telem_r.rate_z;
+			cpu_gyro_x_telem_r: port aocs_cpu_r.rate_out -> send_telem_r.rate;
 			
-			cpu_st_x_telem_r: port aocs_cpu_r.st_rot_x_out -> send_telem_r.st_rot_x;
-			cpu_st_y_telem_r: port aocs_cpu_r.st_rot_y_out -> send_telem_r.st_rot_y;
-			cpu_st_z_telem_r: port aocs_cpu_r.st_rot_z_out -> send_telem_r.st_rot_z;
+			cpu_st_x_telem_r: port aocs_cpu_r.st_rot_out -> send_telem_r.st_rot;
 			
-			cpu_gps_long_telem_r: port aocs_cpu_r.gps_long_out -> send_telem_r.gps_long;
-			cpu_gps_lat_telem_r: port aocs_cpu_r.gps_lat_out -> send_telem_r.gps_lat;
-			cpu_gps_el_telem_r: port aocs_cpu_r.gps_el_out -> send_telem_r.gps_el;
+			cpu_gps_long_telem_r: port aocs_cpu_r.gps_pos_out -> send_telem_r.gps_pos;
 			cpu_gps_time_telem_r: port aocs_cpu_r.gps_time_out -> send_telem_r.gps_time;
 			
 			--2) sending output from the process to cpu
