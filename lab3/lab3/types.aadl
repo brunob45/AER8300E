@@ -120,4 +120,9 @@ public
 	 		Data_Model::Data_Representation => string;
 	 end watchdogString;
 	
+	data watchdogResponse
+	 	properties
+	 		Data_Model::Data_Representation => string;
+	 end watchdogResponse;
+	 
 end lab3::types;

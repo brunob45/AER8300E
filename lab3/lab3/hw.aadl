@@ -5,6 +5,9 @@ public
 	bus AocsBus
 	end AocsBus;
 	
+	bus AocsBus_r
+	end AocsBus_r;
+	
 	bus TmTcBus
 	end TmTcBus;
 	
@@ -153,6 +156,8 @@ public
 			-- stuff related to the watchdog
 			to_watchdog_in: in data port lab3::types::watchdogString;
 			to_watchdog_out: out data port lab3::types::watchdogString;
+			from_watchdog_in: in data port lab3::types::watchdogResponse;
+			from_watchdog_out: out data port lab3::types::watchdogResponse;
 			
 			-- activation values coming from the reconfiguration thread
 			fss_activate_in: in data port lab3::types::deviceActivate;
@@ -223,12 +228,13 @@ public
 			watchdog_acos_main_out: out data port lab3::types::watchdogString;
 			watchdog_acos_red_out: out data port lab3::types::watchdogString;
 			
-			watchdog_response_main_in: in data port lab3::types::aocsActivate;
-			watchdog_response_red_in: in data port lab3::types::aocsActivate;
-			watchdog_response_main_out: out data port lab3::types::aocsActivate;
-			watchdog_response_red_out: out data port lab3::types::aocsActivate;
+			watchdog_response_main_in: in data port lab3::types::watchdogResponse;
+			watchdog_response_red_in: in data port lab3::types::watchdogResponse;
+			watchdog_response_main_out: out data port lab3::types::watchdogResponse;
+			watchdog_response_red_out: out data port lab3::types::watchdogResponse;
 			
 			aocs: requires bus access AocsBus;
+			aocs_r: requires bus access AocsBus_r;
 	end watchdog;
 	
 	

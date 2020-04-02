@@ -1,0 +1,2225 @@
+package lab3
+public
+	with Data_Model;
+	
+	system Satellite
+	end Satellite;
+	
+	bus AocsBus
+	end AocsBus;
+	
+	bus AocsBus_r
+	end AocsBus_r;
+	
+	bus TmTcBus
+	end TmTcBus;
+	
+	-- data types needed
+	
+	data radians
+		properties
+			Data_Model::Data_Representation => float;
+	end radians;
+	
+	data torque
+		properties
+			Data_Model::Data_Representation => float;
+	end torque;
+	
+	data deltaV
+		properties
+			Data_Model::Data_Representation => float;
+	end deltaV;
+	
+	data magneto
+		properties
+			Data_Model::Data_Representation => float;
+	end magneto;
+	
+	data angularRate
+		properties
+			Data_Model::Data_Representation => float;
+	end angularRate;
+	
+	data sunExist
+		properties
+			Data_Model::Data_Representation => boolean;
+	end sunExist;
+	
+	-- position: for representing longitude, latitude and altitude data from GPS
+	data position 
+		properties
+			Data_Model::Data_Representation => float;
+	end position;
+	data gpsTimeStamp
+		properties
+			Data_Model::Data_Representation => string;
+	end gpsTimeStamp;
+	
+	-- data types for activation of devices
+	data deviceActivate
+		properties
+			Data_Model::Data_Representation => boolean;
+	end deviceActivate;
+	
+	data aocsActivate
+		properties
+			Data_Model::Data_Representation => boolean;
+	end aocsActivate;
+	
+	
+	-- data types for defining telecommand messages from main compter. It includes 
+	-- mission mode, orbit parameters, desired orientation if any, and probably reconfiguration
+	-- commands if needed
+	data telecommandString
+		properties
+			Data_Model:: Data_Representation => string;
+	end telecommandString;
+	
+	
+	-- data type for desired orbit parameters sent to AOCS via tele-command (basically a string with desired values)
+	 data telemetryString
+	 	properties
+	 		Data_Model::Data_Representation => string;
+	 end telemetryString;
+	 
+	 -- data type for signals to be sent to the watchdog by AOCS computers
+	 data watchdogString
+	 	properties
+	 		Data_Model::Data_Representation => string;
+	 end watchdogString;
+	
+	
+	-- -------------------------- DEVICES --------------------------------------
+	
+	-- -----------------DEVICES: SENSORS ----------------------
+	device FineSunSensor
+		features
+			fss_rot_x: out data port radians;
+			fss_rot_y: out data port radians;
+			fss_rot_z: out data port radians;
+			fss_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus;
+			
+		flows
+			fx: flow source fss_rot_x {latency => 1ms..2ms;};
+			fy: flow source fss_rot_y {latency => 1ms..2ms;};
+			fz: flow source fss_rot_z {latency => 1ms..2ms;};
+	end FineSunSensor;
+		
+	device CoarseSunSensor
+		features
+			css_rot_x: out data port radians;
+			css_rot_y: out data port radians;
+			css_rot_z: out data port radians;
+			css_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus;
+			
+		flows
+			fx: flow source css_rot_x {latency => 1ms..2ms;};
+			fy: flow source css_rot_y {latency => 1ms..2ms;};
+			fz: flow source css_rot_z {latency => 1ms..2ms;};
+	end CoarseSunSensor;
+	
+	device SunPresenceSensor
+		features
+			is_present: out data port;
+			sps_activate: in data port deviceActivate;
+			
+			
+			comm: requires bus access AocsBus;
+			
+		flows
+			fi: flow source is_present {latency => 1ms..2ms;};
+	end SunPresenceSensor;
+		
+	device EarthSensor
+		features
+			es_rot_x: out data port radians;
+			es_rot_y: out data port radians;
+			es_rot_z: out data port radians;
+			es_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus;
+			
+		flows
+			fx: flow source es_rot_x {latency => 1ms..2ms;};
+			fy: flow source es_rot_y {latency => 1ms..2ms;};
+			fz: flow source es_rot_z {latency => 1ms..2ms;};
+	end EarthSensor;
+	
+	device Magnetometer
+		features
+			mag_x: out data port magneto;
+			mag_y: out data port magneto;
+			mag_z: out data port magneto;
+			mag_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus;
+			
+		flows
+			fx: flow source mag_x {latency => 1ms..2ms;};
+			fy: flow source mag_y {latency => 1ms..2ms;};
+			fz: flow source mag_z {latency => 1ms..2ms;};
+	end Magnetometer;
+		
+	device Gyroscope
+		features
+			rate_x: out data port angularRate;
+			rate_y: out data port angularRate;
+			rate_z: out data port angularRate;
+			rate_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus;
+			
+		flows
+			fx: flow source rate_x {latency => 1ms..2ms;};
+			fy: flow source rate_y {latency => 1ms..2ms;};
+			fz: flow source rate_z {latency => 1ms..2ms;};
+	end Gyroscope;
+		
+	device GPS
+		features
+			long: out data port position;
+			lat: out data port position;
+			el: out data port position;
+			time: out data port gpsTimeStamp;
+			gps_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus;
+			
+		flows
+			fx: flow source long {latency => 1ms..2ms;};
+			fy: flow source lat {latency => 1ms..2ms;};
+			fz: flow source el {latency => 1ms..2ms;};
+			fw: flow source time {latency => 1ms..2ms;};
+	end GPS;
+		
+	device StarTracker
+		features
+			st_rot_x: out data port radians;
+			st_rot_y: out data port radians;
+			st_rot_z: out data port radians;
+			st_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus;
+			
+		flows
+			fx: flow source st_rot_x {latency => 1ms..2ms;};
+			fy: flow source st_rot_y {latency => 1ms..2ms;};
+			fz: flow source st_rot_z {latency => 1ms..2ms;};
+	end StarTracker;
+		
+		
+	-- --------------- DEVICES: ACTUATORS ------------------	
+	device RxWheel
+		features
+			tor_x: in data port torque;
+			tor_y: in data port torque;
+			tor_z: in data port torque;
+			
+			comm: requires bus access AocsBus;
+
+		flows
+			fx: flow sink tor_x {latency => 1ms .. 2ms;};
+			fy: flow sink tor_y {latency => 1ms .. 2ms;};
+			fz: flow sink tor_z {latency => 1ms .. 2ms;};				
+	end RxWheel;
+	device Thruster
+		features
+			dV_x: in data port deltaV;
+			dV_y: in data port deltaV;
+			dV_z: in data port deltaV;
+			
+			comm: requires bus access AocsBus;
+
+		flows
+			fx: flow sink dV_x {latency => 1ms .. 2ms;};
+			fy: flow sink dV_y {latency => 1ms .. 2ms;};
+			fz: flow sink dV_z {latency => 1ms .. 2ms;};				
+	end Thruster;
+	
+	
+	
+	-- ---------------- DEVICES: COMPUTERS AND TELEMETRY -------------- 
+	
+	-- the main AOCS computer .... probably this will have to be repeated for redundency
+	device AocsCpu
+		features
+			-- inputs from devices to computer
+			fss_rot_x_in: in data port radians;
+			fss_rot_y_in: in data port radians;
+			fss_rot_z_in: in data port radians;
+			css_rot_x_in: in data port radians;
+			css_rot_y_in: in data port radians;
+			css_rot_z_in: in data port radians;
+			sps_present_in: in data port sunExist;
+			es_rot_x_in: in data port radians;
+			es_rot_y_in: in data port radians;
+			es_rot_z_in: in data port radians;
+			mag_x_in: in data port magneto;
+			mag_y_in: in data port magneto;
+			mag_z_in: in data port magneto;
+			rate_x_in: in data port angularRate;
+			rate_y_in: in data port angularRate;
+			rate_z_in: in data port angularRate;
+			gps_long_in: in data port position;
+			gps_lat_in: in data port position;
+			gps_el_in: in data port position;
+			gps_time_in: in data port gpsTimeStamp;
+			st_rot_x_in: in data port radians;
+			st_rot_y_in: in data port radians;
+			st_rot_z_in: in data port radians;
+			
+			
+			-- stuff received from/ sent to the main onboard computer
+			telecommand_in: in data port telecommandString; -- this signal is received from the OBC (on board computer)
+			telecommand_out: out data port telecommandString; -- will be sent to processes that need it
+			telemetry_in: in data port telemetryString;
+			telemetry_out: out data port telemetryString;
+			activate_in: in data port aocsActivate;
+			activate_out: out data port aocsActivate;
+			
+			-- stuff related to the watchdog
+			to_watchdog_in: in data port watchdogString;
+			to_watchdog_out: out data port watchdogString;
+			
+			-- activation values coming from the reconfiguration thread
+			fss_activate_in: in data port deviceActivate;
+			css_activate_in: in data port deviceActivate;
+			sps_activate_in: in data port deviceActivate;
+			es_activate_in: in data port deviceActivate;
+			mag_activate_in: in data port deviceActivate;
+			rate_activate_in: in data port deviceActivate;
+			st_activate_in: in data port deviceActivate;
+			gps_activate_in: in data port deviceActivate;
+			
+			
+			-- actuation values received from actuation processes 
+			tor_x_in: in data port torque;
+			tor_y_in: in data port torque;
+			tor_z_in: in data port torque;
+			dV_x_in: in data port deltaV;
+			dV_y_in: in data port deltaV;
+			dV_z_in: in data port deltaV;
+			
+			-- sensor values sent from computer to processes
+			fss_rot_x_out: out data port radians;
+			fss_rot_y_out: out data port radians;
+			fss_rot_z_out: out data port radians;
+			css_rot_x_out: out data port radians;
+			css_rot_y_out: out data port radians;
+			css_rot_z_out: out data port radians;
+			sps_present_out: out data port sunExist;
+			es_rot_x_out: out data port radians;
+			es_rot_y_out: out data port radians;
+			es_rot_z_out: out data port radians;
+			mag_x_out: out data port magneto;
+			mag_y_out: out data port magneto;
+			mag_z_out: out data port magneto;
+			rate_x_out: out data port angularRate;
+			rate_y_out: out data port angularRate;
+			rate_z_out: out data port angularRate;
+			gps_long_out: out data port position;
+			gps_lat_out: out data port position;
+			gps_el_out: out data port position;
+			gps_time_out: out data port gpsTimeStamp;
+			st_rot_x_out: out data port radians;
+			st_rot_y_out: out data port radians;
+			st_rot_z_out: out data port radians;
+			
+			-- activation output signals going to devices
+			fss_activate_out: out data port deviceActivate;
+			css_activate_out: out data port deviceActivate;
+			sps_activate_out: out data port deviceActivate;
+			es_activate_out: out data port deviceActivate;
+			mag_activate_out: out data port deviceActivate;
+			rate_activate_out: out data port deviceActivate;
+			st_activate_out: out data port deviceActivate;
+			gps_activate_out: out data port deviceActivate;
+			
+			
+			-- actuator output values going to actuators 
+			tor_x_out: out data port torque;
+			tor_y_out: out data port torque;
+			tor_z_out: out data port torque;
+			dV_x_out: out data port deltaV;
+			dV_y_out: out data port deltaV;
+			dV_z_out: out data port deltaV;
+			
+			aocs: requires bus access AocsBus;
+			tmtc: requires bus access TmTcBus;
+	end AocsCpu;
+	
+	-- defining the main onboard and data handling computer of the satellite
+	device ObdhCpu
+		features
+			telecommand_in: in data port telecommandString;
+			telecommand_out: out data port telecommandString;
+			telemetry_in: in data port telemetryString;
+			telemetry_out: out data port telemetryString;
+			activation_out: out data port aocsActivate; --responsible for activating the main aocs unit
+			
+			tmtc: requires bus access TmTcBus;
+	end ObdhCpu;
+	
+	
+	-- defining the watchdog that is responsible for monitoring the AOCS
+	device watchdog
+		features
+			-- to be received from AOCS computers
+			watchdog_acos_main_in: in data port watchdogString;
+			watchdog_acos_red_in: in data port watchdogString;
+			
+			-- to be sent to a thread
+			watchdog_acos_main_out: out data port watchdogString;
+			watchdog_acos_red_out: out data port watchdogString;
+			
+			watchdog_response_main_in: in data port aocsActivate;
+			watchdog_response_red_in: in data port aocsActivate;
+			watchdog_response_main_out: out data port aocsActivate;
+			watchdog_response_red_out: out data port aocsActivate;
+			
+			aocs: requires bus access AocsBus;
+	end watchdog;
+	
+	-- --------------------- PROCESSES AND THREADS ---------------------
+	
+	-- process and threads for controlling attitude (with implementations)
+	process attitudeController -- remember: the connections of the ports of a process with sensors is done in the system implementation
+		features
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			sps_present: in data port sunExist;
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			telecommand: in data port telecommandString;
+			
+			tor_x: out data port torque;
+			tor_y: out data port torque;
+			tor_z: out data port torque;
+	end attitudeController;
+	
+	thread fuseOrientation
+		features
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			sps_present: in data port sunExist;
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			telecommand: in data port telecommandString;
+			
+			des_orient_x: out data port radians;
+			des_orient_y: out data port radians;
+			des_orient_z: out data port radians;
+	end fuseOrientation;
+	
+	thread implementation fuseOrientation.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end fuseOrientation.impl;
+	
+	
+	thread attitudeControlThread
+		features
+			des_orient_x: in data port radians;
+			des_orient_y: in data port radians;
+			des_orient_z: in data port radians;
+			
+			tor_x: out data port torque;
+			tor_y: out data port torque;
+			tor_z: out data port torque;
+	end attitudeControlThread;
+	
+	thread implementation attitudeControlThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end attitudeControlThread.impl;
+	
+	process implementation attitudeController.impl
+		subcomponents
+			fusion_worker: thread fuseOrientation;
+			act_worker: thread attitudeControlThread;
+		connections
+			fss_x: port fss_rot_x -> fusion_worker.fss_rot_x;
+			fss_y: port fss_rot_y -> fusion_worker.fss_rot_y;
+			fss_z: port fss_rot_z -> fusion_worker.fss_rot_z;
+			
+			css_x: port css_rot_x -> fusion_worker.css_rot_x;
+			css_y: port css_rot_y -> fusion_worker.css_rot_y;
+			css_z: port css_rot_z -> fusion_worker.css_rot_z;
+			
+			sps: port sps_present -> fusion_worker.sps_present;
+			
+			es_x: port es_rot_x -> fusion_worker.es_rot_x;
+			es_y: port es_rot_y -> fusion_worker.es_rot_y;
+			es_z: port es_rot_z -> fusion_worker.es_rot_z;
+			
+			magx: port mag_x -> fusion_worker.mag_x;
+			magy: port mag_y -> fusion_worker.mag_y;
+			magz: port mag_z -> fusion_worker.mag_z;
+			
+			ratex: port rate_x -> fusion_worker.rate_x;
+			ratey: port rate_y -> fusion_worker.rate_y;
+			ratez: port rate_z -> fusion_worker.rate_z;
+			
+			st_x: port st_rot_x -> fusion_worker.st_rot_x;
+			st_y: port st_rot_y -> fusion_worker.st_rot_y;
+			st_z: port st_rot_z -> fusion_worker.st_rot_z;
+			
+			-- the attitude controller receives the telecommand string as well
+			-- in case there are any specific orientation requirements
+			telecommand_con: port telecommand -> fusion_worker.telecommand;
+			
+			
+			des_x: port fusion_worker.des_orient_x -> act_worker.des_orient_x;
+			des_y: port fusion_worker.des_orient_y -> act_worker.des_orient_y;
+			des_z: port fusion_worker.des_orient_z -> act_worker.des_orient_z;
+			
+			tx: port act_worker.tor_x -> tor_x;
+			ty: port act_worker.tor_y -> tor_y;
+			tz: port act_worker.tor_z -> tor_z;
+	end attitudeController.impl;
+	
+	
+	-- process and thread for controlling the orbit (with implementations)
+	process orbitController
+		features
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			telecommand: in data port telecommandString;
+			
+			dV_x: out data port deltaV;
+			dV_y: out data port deltaV;
+			dV_z: out data port deltaV;
+	end orbitController;
+	
+	thread orbitControlThread
+		features
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			telecommand: in data port telecommandString;
+			
+			dV_x: out data port deltaV;
+			dV_y: out data port deltaV;
+			dV_z: out data port deltaV;
+	end orbitControlThread;
+	
+	thread implementation orbitControlThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 10000ms;
+	end orbitControlThread.impl;
+	
+	process implementation orbitController.impl
+		subcomponents
+			orbit_worker: thread orbitControlThread;
+		connections
+			gps_long_con: port gps_long -> orbit_worker.gps_long;
+			gps_lat_con: port gps_lat -> orbit_worker.gps_lat;
+			gps_el_con: port gps_el -> orbit_worker.gps_el;
+			gps_time_con: port gps_time -> orbit_worker.gps_time;
+			
+			st_x: port st_rot_x -> orbit_worker.st_rot_x;
+			st_y: port st_rot_y -> orbit_worker.st_rot_y;
+			st_z: port st_rot_z -> orbit_worker.st_rot_z;
+			
+			mission_mode_in: port telecommand -> orbit_worker.telecommand;
+			
+			dv_x_in: port orbit_worker.dV_x -> dV_x;
+			dv_y_in: port orbit_worker.dV_y -> dV_y;
+			dv_z_in: port orbit_worker.dV_z -> dV_z;
+	end orbitController.impl;
+	
+	
+	
+	-- process and threads for detecting anomalies and reconfiguring the system (with implementations)
+	
+	-- this process takes all sensor inputs, compares them and produces on/off signals to (de)activate devices
+	process AocsReconfiguration
+		features
+			-- inputs of the process
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			telecommand: in data port telecommandString;
+			activate: in data port aocsActivate;
+			
+			-- outputs of the process
+			fss_activate: out data port deviceActivate;
+			css_activate: out data port deviceActivate;
+			sps_activate: out data port deviceActivate;
+			es_activate: out data port deviceActivate;
+			mag_activate: out data port deviceActivate;
+			rate_activate: out data port deviceActivate;
+			st_activate: out data port deviceActivate;
+			gps_activate: out data port deviceActivate;
+			
+	end AocsReconfiguration;
+	
+	-- this thread is responsible for comparing sensor readings, checking their ranges and issue (de)activation commands for different devices (sensors basically) 
+	thread AocsReconfigurationThread
+		features
+		-- inputs of the thread
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			telecommand: in data port telecommandString;
+			activate: in data port aocsActivate;
+			
+			-- outputs of the thread
+			fss_activate: out data port deviceActivate;
+			css_activate: out data port deviceActivate;
+			sps_activate: out data port deviceActivate;
+			es_activate: out data port deviceActivate;
+			mag_activate: out data port deviceActivate;
+			rate_activate: out data port deviceActivate;
+			st_activate: out data port deviceActivate;
+			gps_activate: out data port deviceActivate;
+	end AocsReconfigurationThread;
+	
+	thread implementation AocsReconfigurationThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end AocsReconfigurationThread.impl;
+	
+	
+	process implementation AocsReconfiguration.impl
+		subcomponents
+			worker: thread AocsReconfigurationThread;
+		connections
+			-- inputs connections
+			fss_x: port fss_rot_x -> worker.fss_rot_x;
+			fss_y: port fss_rot_y -> worker.fss_rot_y;
+			fss_z: port fss_rot_z -> worker.fss_rot_z;
+			
+			css_x: port css_rot_x -> worker.css_rot_x;
+			css_y: port css_rot_y -> worker.css_rot_y;
+			css_z: port css_rot_z -> worker.css_rot_z;
+			
+			sps: port sps_present -> worker.sps_present;
+			
+			es_x: port es_rot_x -> worker.es_rot_x;
+			es_y: port es_rot_y -> worker.es_rot_y;
+			es_z: port es_rot_z -> worker.es_rot_z;
+			
+			magx: port mag_x -> worker.mag_x;
+			magy: port mag_y -> worker.mag_y;
+			magz: port mag_z -> worker.mag_z;
+			
+			ratex: port rate_x -> worker.rate_x;
+			ratey: port rate_y -> worker.rate_y;
+			ratez: port rate_z -> worker.rate_z;
+			
+			st_x: port st_rot_x -> worker.st_rot_x;
+			st_y: port st_rot_y -> worker.st_rot_y;
+			st_z: port st_rot_z -> worker.st_rot_z;
+			
+			gps_long_con: port gps_long -> worker.gps_long;
+			gps_lat_con: port gps_lat -> worker.gps_lat;
+			gps_el_con: port gps_el -> worker.gps_el;
+			gps_time_con: port gps_time -> worker.gps_time;
+	
+			telecommand_con: port telecommand -> worker.telecommand;
+			activate_cond: port activate -> worker.activate;
+			
+			-- outputs connections
+			fss_act: port worker.fss_activate -> fss_activate;
+			css_act: port worker.css_activate -> css_activate;
+			sps_act: port worker.sps_activate -> sps_activate;
+			es_act: port worker.es_activate -> es_activate;
+			mag_act: port worker.mag_activate -> mag_activate;
+			rate_act: port worker.rate_activate -> rate_activate;
+			st_act: port worker.st_activate -> st_activate;
+			gps_act: port worker.gps_activate -> gps_activate;
+							
+	end AocsReconfiguration.impl;
+	
+	
+	
+	-- telemeetry related processes and threads
+	process sendTelemetry
+		features
+			-- inputs of the process
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			telemtryMessage: out data port telemetryString;
+	end sendTelemetry;
+	
+	
+	thread sendTelemetryThread
+		features
+			-- inputs of the process
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			telemtryMessage: out data port telemetryString;
+	end sendTelemetryThread;
+	
+	thread implementation sendTelemetryThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 1000ms;
+	end sendTelemetryThread.impl;
+	
+	
+	process implementation sendTelemetry.impl
+		subcomponents
+			worker: thread sendTelemetryThread;
+		connections
+			fss_x: port fss_rot_x -> worker.fss_rot_x;
+			fss_y: port fss_rot_y -> worker.fss_rot_y;
+			fss_z: port fss_rot_z -> worker.fss_rot_z;
+			
+			css_x: port css_rot_x -> worker.css_rot_x;
+			css_y: port css_rot_y -> worker.css_rot_y;
+			css_z: port css_rot_z -> worker.css_rot_z;
+			
+			sps: port sps_present -> worker.sps_present;
+			
+			es_x: port es_rot_x -> worker.es_rot_x;
+			es_y: port es_rot_y -> worker.es_rot_y;
+			es_z: port es_rot_z -> worker.es_rot_z;
+			
+			magx: port mag_x -> worker.mag_x;
+			magy: port mag_y -> worker.mag_y;
+			magz: port mag_z -> worker.mag_z;
+			
+			ratex: port rate_x -> worker.rate_x;
+			ratey: port rate_y -> worker.rate_y;
+			ratez: port rate_z -> worker.rate_z;
+			
+			st_x: port st_rot_x -> worker.st_rot_x;
+			st_y: port st_rot_y -> worker.st_rot_y;
+			st_z: port st_rot_z -> worker.st_rot_z;
+			
+			gps_long_con: port gps_long -> worker.gps_long;
+			gps_lat_con: port gps_lat -> worker.gps_lat;
+			gps_el_con: port gps_el -> worker.gps_el;
+			gps_time_con: port gps_time -> worker.gps_time;
+			
+			telemetry_con: port worker.telemtryMessage -> telemtryMessage;
+			 
+	end sendTelemetry.impl;
+	
+	
+	-- watchdog related processes and threads
+	process watchdogEvent
+		features
+			to_watchdog: out data port watchdogString;
+	end watchdogEvent;
+	
+	thread watchdogEventThread
+		features
+			to_watchdog: out data port watchdogString;
+	end watchdogEventThread;
+	
+	thread implementation watchdogEventThread.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 1000ms;
+	end watchdogEventThread.impl;
+	
+	process implementation watchdogEvent.impl --very simple thread that contains a function that generates a periodic event to be sent to watchdog
+		subcomponents 
+			worker: thread watchdogEventThread;
+		connections
+			to_watchdog_con: port worker.to_watchdog -> to_watchdog;
+	end watchdogEvent.impl;
+	
+
+	
+	
+	
+	-- /////////////// REDUNDANT DEVICES DEFINITIONS \\\\\\\\\\\\\\\\\\\\
+	device FineSunSensor_r
+		features
+			fss_rot_x: out data port radians;
+			fss_rot_y: out data port radians;
+			fss_rot_z: out data port radians;
+			fss_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus_r;
+			
+		flows
+			fx: flow source fss_rot_x {latency => 1ms..2ms;};
+			fy: flow source fss_rot_y {latency => 1ms..2ms;};
+			fz: flow source fss_rot_z {latency => 1ms..2ms;};
+	end FineSunSensor_r;
+		
+	device CoarseSunSensor_r
+		features
+			css_rot_x: out data port radians;
+			css_rot_y: out data port radians;
+			css_rot_z: out data port radians;
+			css_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus_r;
+			
+		flows
+			fx: flow source css_rot_x {latency => 1ms..2ms;};
+			fy: flow source css_rot_y {latency => 1ms..2ms;};
+			fz: flow source css_rot_z {latency => 1ms..2ms;};
+	end CoarseSunSensor_r;
+	
+	device SunPresenceSensor_r
+		features
+			is_present: out data port;
+			sps_activate: in data port deviceActivate;
+			
+			
+			comm: requires bus access AocsBus_r;
+			
+		flows
+			fi: flow source is_present {latency => 1ms..2ms;};
+	end SunPresenceSensor_r;
+		
+	device EarthSensor_r
+		features
+			es_rot_x: out data port radians;
+			es_rot_y: out data port radians;
+			es_rot_z: out data port radians;
+			es_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus_r;
+			
+		flows
+			fx: flow source es_rot_x {latency => 1ms..2ms;};
+			fy: flow source es_rot_y {latency => 1ms..2ms;};
+			fz: flow source es_rot_z {latency => 1ms..2ms;};
+	end EarthSensor_r;
+	
+	device Magnetometer_r
+		features
+			mag_x: out data port magneto;
+			mag_y: out data port magneto;
+			mag_z: out data port magneto;
+			mag_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus_r;
+			
+		flows
+			fx: flow source mag_x {latency => 1ms..2ms;};
+			fy: flow source mag_y {latency => 1ms..2ms;};
+			fz: flow source mag_z {latency => 1ms..2ms;};
+	end Magnetometer_r;
+		
+	device Gyroscope_r
+		features
+			rate_x: out data port angularRate;
+			rate_y: out data port angularRate;
+			rate_z: out data port angularRate;
+			rate_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus_r;
+			
+		flows
+			fx: flow source rate_x {latency => 1ms..2ms;};
+			fy: flow source rate_y {latency => 1ms..2ms;};
+			fz: flow source rate_z {latency => 1ms..2ms;};
+	end Gyroscope_r;
+		
+	device GPS_r
+		features
+			long: out data port position;
+			lat: out data port position;
+			el: out data port position;
+			time: out data port gpsTimeStamp;
+			gps_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus_r;
+			
+		flows
+			fx: flow source long {latency => 1ms..2ms;};
+			fy: flow source lat {latency => 1ms..2ms;};
+			fz: flow source el {latency => 1ms..2ms;};
+			fw: flow source time {latency => 1ms..2ms;};
+	end GPS_r;
+		
+	device StarTracker_r
+		features
+			st_rot_x: out data port radians;
+			st_rot_y: out data port radians;
+			st_rot_z: out data port radians;
+			st_activate: in data port deviceActivate;
+			
+			comm: requires bus access AocsBus_r;
+			
+		flows
+			fx: flow source st_rot_x {latency => 1ms..2ms;};
+			fy: flow source st_rot_y {latency => 1ms..2ms;};
+			fz: flow source st_rot_z {latency => 1ms..2ms;};
+	end StarTracker_r;
+		
+		
+	-- --------------- DEVICES: ACTUATORS ------------------	
+--	device RxWheel
+--		features
+--			tor_x: in data port torque;
+--			tor_y: in data port torque;
+--			tor_z: in data port torque;
+--			
+--			comm: requires bus access AocsBus;
+--
+--		flows
+--			fx: flow sink tor_x {latency => 1ms .. 2ms;};
+--			fy: flow sink tor_y {latency => 1ms .. 2ms;};
+--			fz: flow sink tor_z {latency => 1ms .. 2ms;};				
+--	end RxWheel;
+--	device Thruster
+--		features
+--			dV_x: in data port deltaV;
+--			dV_y: in data port deltaV;
+--			dV_z: in data port deltaV;
+--			
+--			comm: requires bus access AocsBus;
+--
+--		flows
+--			fx: flow sink dV_x {latency => 1ms .. 2ms;};
+--			fy: flow sink dV_y {latency => 1ms .. 2ms;};
+--			fz: flow sink dV_z {latency => 1ms .. 2ms;};				
+--	end Thruster;
+	
+	
+	
+	-- ---------------- DEVICES: COMPUTERS AND TELEMETRY -------------- 
+	
+	-- the main AOCS computer .... probably this will have to be repeated for redundency
+	device AocsCpu_r
+		features
+			-- inputs from devices to computer
+			fss_rot_x_in: in data port radians;
+			fss_rot_y_in: in data port radians;
+			fss_rot_z_in: in data port radians;
+			css_rot_x_in: in data port radians;
+			css_rot_y_in: in data port radians;
+			css_rot_z_in: in data port radians;
+			sps_present_in: in data port sunExist;
+			es_rot_x_in: in data port radians;
+			es_rot_y_in: in data port radians;
+			es_rot_z_in: in data port radians;
+			mag_x_in: in data port magneto;
+			mag_y_in: in data port magneto;
+			mag_z_in: in data port magneto;
+			rate_x_in: in data port angularRate;
+			rate_y_in: in data port angularRate;
+			rate_z_in: in data port angularRate;
+			gps_long_in: in data port position;
+			gps_lat_in: in data port position;
+			gps_el_in: in data port position;
+			gps_time_in: in data port gpsTimeStamp;
+			st_rot_x_in: in data port radians;
+			st_rot_y_in: in data port radians;
+			st_rot_z_in: in data port radians;
+			
+			
+			-- stuff received from/ sent to the main onboard computer
+			telecommand_in: in data port telecommandString; -- this signal is received from the OBC (on board computer)
+			telecommand_out: out data port telecommandString; -- will be sent to processes that need it
+			telemetry_in: in data port telemetryString;
+			telemetry_out: out data port telemetryString;
+			activate_in: in data port aocsActivate;
+			activate_out: out data port aocsActivate;
+			
+			-- stuff related to the watchdog
+			to_watchdog_in: in data port watchdogString;
+			to_watchdog_out: out data port watchdogString;
+			
+			-- activation values coming from the reconfiguration thread
+			fss_activate_in: in data port deviceActivate;
+			css_activate_in: in data port deviceActivate;
+			sps_activate_in: in data port deviceActivate;
+			es_activate_in: in data port deviceActivate;
+			mag_activate_in: in data port deviceActivate;
+			rate_activate_in: in data port deviceActivate;
+			st_activate_in: in data port deviceActivate;
+			gps_activate_in: in data port deviceActivate;
+			
+			
+			-- actuation values received from actuation processes 
+			tor_x_in: in data port torque;
+			tor_y_in: in data port torque;
+			tor_z_in: in data port torque;
+			dV_x_in: in data port deltaV;
+			dV_y_in: in data port deltaV;
+			dV_z_in: in data port deltaV;
+			
+			-- sensor values sent from computer to processes
+			fss_rot_x_out: out data port radians;
+			fss_rot_y_out: out data port radians;
+			fss_rot_z_out: out data port radians;
+			css_rot_x_out: out data port radians;
+			css_rot_y_out: out data port radians;
+			css_rot_z_out: out data port radians;
+			sps_present_out: out data port sunExist;
+			es_rot_x_out: out data port radians;
+			es_rot_y_out: out data port radians;
+			es_rot_z_out: out data port radians;
+			mag_x_out: out data port magneto;
+			mag_y_out: out data port magneto;
+			mag_z_out: out data port magneto;
+			rate_x_out: out data port angularRate;
+			rate_y_out: out data port angularRate;
+			rate_z_out: out data port angularRate;
+			gps_long_out: out data port position;
+			gps_lat_out: out data port position;
+			gps_el_out: out data port position;
+			gps_time_out: out data port gpsTimeStamp;
+			st_rot_x_out: out data port radians;
+			st_rot_y_out: out data port radians;
+			st_rot_z_out: out data port radians;
+			
+			-- activation output signals going to devices
+			fss_activate_out: out data port deviceActivate;
+			css_activate_out: out data port deviceActivate;
+			sps_activate_out: out data port deviceActivate;
+			es_activate_out: out data port deviceActivate;
+			mag_activate_out: out data port deviceActivate;
+			rate_activate_out: out data port deviceActivate;
+			st_activate_out: out data port deviceActivate;
+			gps_activate_out: out data port deviceActivate;
+			
+			
+			-- actuator output values going to actuators 
+			tor_x_out: out data port torque;
+			tor_y_out: out data port torque;
+			tor_z_out: out data port torque;
+			dV_x_out: out data port deltaV;
+			dV_y_out: out data port deltaV;
+			dV_z_out: out data port deltaV;
+			
+			aocs_r: requires bus access AocsBus_r;
+			tmtc: requires bus access TmTcBus;
+	end AocsCpu_r;
+	
+	
+	
+	
+	-- /////////////////////// PROCESSES FOR REDUNDANT SYSTEM \\\\\\\\\\\\\\\\\\
+	-- process and threads for controlling attitude (with implementations)
+	process attitudeController_r -- remember: the connections of the ports of a process with sensors is done in the system implementation
+		features
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			sps_present: in data port sunExist;
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			telecommand: in data port telecommandString;
+			
+			tor_x: out data port torque;
+			tor_y: out data port torque;
+			tor_z: out data port torque;
+	end attitudeController_r;
+	
+	thread fuseOrientation_r
+		features
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			sps_present: in data port sunExist;
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			telecommand: in data port telecommandString;
+			
+			des_orient_x: out data port radians;
+			des_orient_y: out data port radians;
+			des_orient_z: out data port radians;
+	end fuseOrientation_r;
+	
+	thread implementation fuseOrientation_r.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end fuseOrientation_r.impl;
+	
+	
+	thread attitudeControlThread_r
+		features
+			des_orient_x: in data port radians;
+			des_orient_y: in data port radians;
+			des_orient_z: in data port radians;
+			
+			tor_x: out data port torque;
+			tor_y: out data port torque;
+			tor_z: out data port torque;
+	end attitudeControlThread_r;
+	
+	thread implementation attitudeControlThread_r.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end attitudeControlThread_r.impl;
+	
+	process implementation attitudeController_r.impl
+		subcomponents
+			fusion_worker: thread fuseOrientation_r;
+			act_worker: thread attitudeControlThread_r;
+		connections
+			fss_x: port fss_rot_x -> fusion_worker.fss_rot_x;
+			fss_y: port fss_rot_y -> fusion_worker.fss_rot_y;
+			fss_z: port fss_rot_z -> fusion_worker.fss_rot_z;
+			
+			css_x: port css_rot_x -> fusion_worker.css_rot_x;
+			css_y: port css_rot_y -> fusion_worker.css_rot_y;
+			css_z: port css_rot_z -> fusion_worker.css_rot_z;
+			
+			sps: port sps_present -> fusion_worker.sps_present;
+			
+			es_x: port es_rot_x -> fusion_worker.es_rot_x;
+			es_y: port es_rot_y -> fusion_worker.es_rot_y;
+			es_z: port es_rot_z -> fusion_worker.es_rot_z;
+			
+			magx: port mag_x -> fusion_worker.mag_x;
+			magy: port mag_y -> fusion_worker.mag_y;
+			magz: port mag_z -> fusion_worker.mag_z;
+			
+			ratex: port rate_x -> fusion_worker.rate_x;
+			ratey: port rate_y -> fusion_worker.rate_y;
+			ratez: port rate_z -> fusion_worker.rate_z;
+			
+			st_x: port st_rot_x -> fusion_worker.st_rot_x;
+			st_y: port st_rot_y -> fusion_worker.st_rot_y;
+			st_z: port st_rot_z -> fusion_worker.st_rot_z;
+			
+			-- the attitude controller receives the telecommand string as well
+			-- in case there are any specific orientation requirements
+			telecommand_con: port telecommand -> fusion_worker.telecommand;
+			
+			
+			des_x: port fusion_worker.des_orient_x -> act_worker.des_orient_x;
+			des_y: port fusion_worker.des_orient_y -> act_worker.des_orient_y;
+			des_z: port fusion_worker.des_orient_z -> act_worker.des_orient_z;
+			
+			tx: port act_worker.tor_x -> tor_x;
+			ty: port act_worker.tor_y -> tor_y;
+			tz: port act_worker.tor_z -> tor_z;
+	end attitudeController_r.impl;
+	
+	
+	-- process and thread for controlling the orbit (with implementations)
+	process orbitController_r
+		features
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			telecommand: in data port telecommandString;
+			
+			dV_x: out data port deltaV;
+			dV_y: out data port deltaV;
+			dV_z: out data port deltaV;
+	end orbitController_r;
+	
+	thread orbitControlThread_r
+		features
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			telecommand: in data port telecommandString;
+			
+			dV_x: out data port deltaV;
+			dV_y: out data port deltaV;
+			dV_z: out data port deltaV;
+	end orbitControlThread_r;
+	
+	thread implementation orbitControlThread_r.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 10000ms;
+	end orbitControlThread_r.impl;
+	
+	process implementation orbitController_r.impl
+		subcomponents
+			orbit_worker: thread orbitControlThread_r;
+		connections
+			gps_long_con: port gps_long -> orbit_worker.gps_long;
+			gps_lat_con: port gps_lat -> orbit_worker.gps_lat;
+			gps_el_con: port gps_el -> orbit_worker.gps_el;
+			gps_time_con: port gps_time -> orbit_worker.gps_time;
+			
+			st_x: port st_rot_x -> orbit_worker.st_rot_x;
+			st_y: port st_rot_y -> orbit_worker.st_rot_y;
+			st_z: port st_rot_z -> orbit_worker.st_rot_z;
+			
+			mission_mode_in: port telecommand -> orbit_worker.telecommand;
+			
+			dv_x_in: port orbit_worker.dV_x -> dV_x;
+			dv_y_in: port orbit_worker.dV_y -> dV_y;
+			dv_z_in: port orbit_worker.dV_z -> dV_z;
+	end orbitController_r.impl;
+	
+	
+	
+	-- process and threads for detecting anomalies and reconfiguring the system (with implementations)
+	
+	-- this process takes all sensor inputs, compares them and produces on/off signals to (de)activate devices
+	process AocsReconfiguration_r
+		features
+			-- inputs of the process
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			telecommand: in data port telecommandString;
+			activate: in data port aocsActivate;
+			
+			-- outputs of the process
+			fss_activate: out data port deviceActivate;
+			css_activate: out data port deviceActivate;
+			sps_activate: out data port deviceActivate;
+			es_activate: out data port deviceActivate;
+			mag_activate: out data port deviceActivate;
+			rate_activate: out data port deviceActivate;
+			st_activate: out data port deviceActivate;
+			gps_activate: out data port deviceActivate;
+			
+	end AocsReconfiguration_r;
+	
+	-- this thread is responsible for comparing sensor readings, checking their ranges and issue (de)activation commands for different devices (sensors basically) 
+	thread AocsReconfigurationThread_r
+		features
+		-- inputs of the thread
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			telecommand: in data port telecommandString;
+			activate: in data port aocsActivate;
+			
+			-- outputs of the thread
+			fss_activate: out data port deviceActivate;
+			css_activate: out data port deviceActivate;
+			sps_activate: out data port deviceActivate;
+			es_activate: out data port deviceActivate;
+			mag_activate: out data port deviceActivate;
+			rate_activate: out data port deviceActivate;
+			st_activate: out data port deviceActivate;
+			gps_activate: out data port deviceActivate;
+	end AocsReconfigurationThread_r;
+	
+	thread implementation AocsReconfigurationThread_r.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 100ms;
+	end AocsReconfigurationThread_r.impl;
+	
+	
+	process implementation AocsReconfiguration_r.impl
+		subcomponents
+			worker: thread AocsReconfigurationThread_r;
+		connections
+			-- inputs connections
+			fss_x: port fss_rot_x -> worker.fss_rot_x;
+			fss_y: port fss_rot_y -> worker.fss_rot_y;
+			fss_z: port fss_rot_z -> worker.fss_rot_z;
+			
+			css_x: port css_rot_x -> worker.css_rot_x;
+			css_y: port css_rot_y -> worker.css_rot_y;
+			css_z: port css_rot_z -> worker.css_rot_z;
+			
+			sps: port sps_present -> worker.sps_present;
+			
+			es_x: port es_rot_x -> worker.es_rot_x;
+			es_y: port es_rot_y -> worker.es_rot_y;
+			es_z: port es_rot_z -> worker.es_rot_z;
+			
+			magx: port mag_x -> worker.mag_x;
+			magy: port mag_y -> worker.mag_y;
+			magz: port mag_z -> worker.mag_z;
+			
+			ratex: port rate_x -> worker.rate_x;
+			ratey: port rate_y -> worker.rate_y;
+			ratez: port rate_z -> worker.rate_z;
+			
+			st_x: port st_rot_x -> worker.st_rot_x;
+			st_y: port st_rot_y -> worker.st_rot_y;
+			st_z: port st_rot_z -> worker.st_rot_z;
+			
+			gps_long_con: port gps_long -> worker.gps_long;
+			gps_lat_con: port gps_lat -> worker.gps_lat;
+			gps_el_con: port gps_el -> worker.gps_el;
+			gps_time_con: port gps_time -> worker.gps_time;
+	
+			telecommand_con: port telecommand -> worker.telecommand;
+			activate_cond: port activate -> worker.activate;
+			
+			-- outputs connections
+			fss_act: port worker.fss_activate -> fss_activate;
+			css_act: port worker.css_activate -> css_activate;
+			sps_act: port worker.sps_activate -> sps_activate;
+			es_act: port worker.es_activate -> es_activate;
+			mag_act: port worker.mag_activate -> mag_activate;
+			rate_act: port worker.rate_activate -> rate_activate;
+			st_act: port worker.st_activate -> st_activate;
+			gps_act: port worker.gps_activate -> gps_activate;
+							
+	end AocsReconfiguration_r.impl;
+	
+	
+	
+	-- telemeetry related processes and threads
+	process sendTelemetry_r
+		features
+			-- inputs of the process
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			telemtryMessage: out data port telemetryString;
+	end sendTelemetry_r;
+	
+	
+	thread sendTelemetryThread_r
+		features
+			-- inputs of the process
+			fss_rot_x: in data port radians;
+			fss_rot_y: in data port radians;
+			fss_rot_z: in data port radians;
+			
+			css_rot_x: in data port radians;
+			css_rot_y: in data port radians;
+			css_rot_z: in data port radians;
+			
+			sps_present: in data port sunExist;
+			
+			es_rot_x: in data port radians;
+			es_rot_y: in data port radians;
+			es_rot_z: in data port radians;
+			
+			mag_x: in data port magneto;
+			mag_y: in data port magneto;
+			mag_z: in data port magneto;
+			
+			rate_x: in data port angularRate;
+			rate_y: in data port angularRate;
+			rate_z: in data port angularRate;
+			
+			st_rot_x: in data port radians;
+			st_rot_y: in data port radians;
+			st_rot_z: in data port radians;
+			
+			gps_long: in data port position;
+			gps_lat: in data port position;
+			gps_el: in data port position;
+			gps_time: in data port gpsTimeStamp;
+			
+			telemtryMessage: out data port telemetryString;
+	end sendTelemetryThread_r;
+	
+	thread implementation sendTelemetryThread_r.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 1000ms;
+	end sendTelemetryThread_r.impl;
+	
+	
+	process implementation sendTelemetry_r.impl
+		subcomponents
+			worker: thread sendTelemetryThread_r;
+		connections
+			fss_x: port fss_rot_x -> worker.fss_rot_x;
+			fss_y: port fss_rot_y -> worker.fss_rot_y;
+			fss_z: port fss_rot_z -> worker.fss_rot_z;
+			
+			css_x: port css_rot_x -> worker.css_rot_x;
+			css_y: port css_rot_y -> worker.css_rot_y;
+			css_z: port css_rot_z -> worker.css_rot_z;
+			
+			sps: port sps_present -> worker.sps_present;
+			
+			es_x: port es_rot_x -> worker.es_rot_x;
+			es_y: port es_rot_y -> worker.es_rot_y;
+			es_z: port es_rot_z -> worker.es_rot_z;
+			
+			magx: port mag_x -> worker.mag_x;
+			magy: port mag_y -> worker.mag_y;
+			magz: port mag_z -> worker.mag_z;
+			
+			ratex: port rate_x -> worker.rate_x;
+			ratey: port rate_y -> worker.rate_y;
+			ratez: port rate_z -> worker.rate_z;
+			
+			st_x: port st_rot_x -> worker.st_rot_x;
+			st_y: port st_rot_y -> worker.st_rot_y;
+			st_z: port st_rot_z -> worker.st_rot_z;
+			
+			gps_long_con: port gps_long -> worker.gps_long;
+			gps_lat_con: port gps_lat -> worker.gps_lat;
+			gps_el_con: port gps_el -> worker.gps_el;
+			gps_time_con: port gps_time -> worker.gps_time;
+			
+			telemetry_con: port worker.telemtryMessage -> telemtryMessage;
+			 
+	end sendTelemetry_r.impl;
+	
+	
+	-- watchdog related processes and threads
+	process watchdogEvent_r
+		features
+			to_watchdog: out data port watchdogString;
+	end watchdogEvent_r;
+	
+	thread watchdogEventThread_r
+		features
+			to_watchdog: out data port watchdogString;
+	end watchdogEventThread_r;
+	
+	thread implementation watchdogEventThread_r.impl
+		properties
+			Dispatch_Protocol => Periodic;
+			Period => 1000ms;
+	end watchdogEventThread_r.impl;
+	
+	process implementation watchdogEvent_r.impl --very simple thread that contains a function that generates a periodic event to be sent to watchdog
+		subcomponents 
+			worker: thread watchdogEventThread_r;
+		connections
+			to_watchdog_con: port worker.to_watchdog -> to_watchdog;
+	end watchdogEvent_r.impl;
+	
+	
+	
+	
+	-- ----------------------SYSTEM IMPLEMENTAITON (CONNECTIONS BETWEEN DEVICES)--------------
+	system implementation Satellite.impl
+		subcomponents
+			
+			-- ------ MAIN DEVICES ------------
+			-- including the sensors in the satellite
+			fss_sens: device FineSunSensor;
+			css_sens: device CoarseSunSensor;
+			sps_sens: device SunPresenceSensor;
+			es_sens: device EarthSensor;
+			mag_sens: device Magnetometer;
+			gyro_sens: device Gyroscope;
+			gps_sens: device GPS;
+			st_sens: device StarTracker;
+			
+			-- including the actuators in the satellite
+			inertia_wheel: device RxWheel;
+			thruster: device Thruster;
+			
+			
+			-- ---------REDUNDANT DEVICES ----------
+			fss_sens_r: device FineSunSensor_r;
+			css_sens_r: device CoarseSunSensor_r;
+			sps_sens_r: device SunPresenceSensor_r;
+			es_sens_r: device EarthSensor_r;
+			mag_sens_r: device Magnetometer_r;
+			gyro_sens_r: device Gyroscope_r;
+			gps_sens_r: device GPS_r;
+			st_sens_r: device StarTracker_r;
+			
+			-- including the actuators in the satellite
+--			inertia_wheel_r: device RxWheel;
+--			thruster_r: device Thruster;
+			
+			
+			-- ----------- MAIN AND REDUNDANT COMPUTERS -----------
+			-- including the CPUs in the system
+			aocs_cpu: device AocsCpu;
+			aocs_cpu_r: device AocsCpu_r;
+			obdh_cpu: device ObdhCpu;
+			watchdog_module: device watchdog;
+			
+			-- Main processes in the system
+			 attitude_cont: process attitudeController;
+			 orbit_cont: process orbitController;
+			 aocs_reconfig: process AocsReconfiguration;
+			 send_telem: process sendTelemetry;
+			 watchdog_event: process watchdogEvent;
+			 
+			 -- Redundant processes in the system
+			 attitude_cont_r: process attitudeController_r;
+			 orbit_cont_r: process orbitController_r;
+			 aocs_reconfig_r: process AocsReconfiguration_r;
+			 send_telem_r: process sendTelemetry_r;
+			 watchdog_event_r: process watchdogEvent_r;
+			 
+			 -- including the busses needed 
+			 aocs_bus: bus AocsBus;
+			 aocs_bus_r: bus AocsBus_r;
+			 tmtc_bus: bus TmTcBus;
+			 
+			 
+		connections
+			
+			-- buses connections (main components) 
+			comm_fss: bus access aocs_bus <-> fss_sens.comm;
+			comm_css: bus access aocs_bus <-> css_sens.comm;
+			comm_sps: bus access aocs_bus <-> sps_sens.comm;
+			comm_es: bus access aocs_bus <-> es_sens.comm;
+			comm_mag: bus access aocs_bus <-> mag_sens.comm;
+			comm_gyro: bus access aocs_bus <-> gyro_sens.comm;
+			comm_gps: bus access aocs_bus <-> gps_sens.comm;
+			comm_st: bus access aocs_bus <-> st_sens.comm;
+			
+			comm_aocs_cpu: bus access aocs_bus <-> aocs_cpu.aocs;
+			comm_aocs_to_obdh: bus access tmtc_bus <-> aocs_cpu.tmtc;
+			
+			
+			-- buses connections (redundant components)
+			comm_fss_r: bus access aocs_bus_r <-> fss_sens_r.comm;
+			comm_css_r: bus access aocs_bus_r <-> css_sens_r.comm;
+			comm_sps_r: bus access aocs_bus_r <-> sps_sens_r.comm;
+			comm_es_r: bus access aocs_bus_r <-> es_sens_r.comm;
+			comm_mag_r: bus access aocs_bus_r <-> mag_sens_r.comm;
+			comm_gyro_r: bus access aocs_bus_r <-> gyro_sens_r.comm;
+			comm_gps_r: bus access aocs_bus_r <-> gps_sens_r.comm;
+			comm_st_r: bus access aocs_bus_r <-> st_sens_r.comm;
+			
+			comm_aocs_cpu_r: bus access aocs_bus_r <-> aocs_cpu_r.aocs_r;
+			comm_aocs_to_obdh_r: bus access tmtc_bus <-> aocs_cpu_r.tmtc;
+			
+			-- //////////// SENSOR-DEVICE CONNECTION FOR MAIN SYSTEM \\\\\\\\\\\\\
+			-- sensor connections to cpu (sens data + activation signal)
+			fss_x: port fss_sens.fss_rot_x -> aocs_cpu.fss_rot_x_in;
+			fss_y: port fss_sens.fss_rot_y -> aocs_cpu.fss_rot_y_in;
+			fss_z: port fss_sens.fss_rot_z -> aocs_cpu.fss_rot_z_in;
+			fss_active: port aocs_cpu.fss_activate_out -> fss_sens.fss_activate;
+			
+			css_x: port css_sens.css_rot_x -> aocs_cpu.css_rot_x_in;
+			css_y: port css_sens.css_rot_y -> aocs_cpu.css_rot_y_in;
+			css_z: port css_sens.css_rot_z -> aocs_cpu.css_rot_z_in;
+			css_active: port aocs_cpu.css_activate_out -> css_sens.css_activate;
+			
+			sps: port sps_sens.is_present -> aocs_cpu.sps_present_in;
+			sps_active: port aocs_cpu.sps_activate_out -> sps_sens.sps_activate;
+			
+			es_x: port es_sens.es_rot_x -> aocs_cpu.es_rot_x_in;
+			es_y: port es_sens.es_rot_y -> aocs_cpu.es_rot_y_in;
+			es_z: port es_sens.es_rot_z -> aocs_cpu.es_rot_z_in;
+			es_active: port aocs_cpu.es_activate_out -> es_sens.es_activate;
+			
+			magx: port mag_sens.mag_x -> aocs_cpu.mag_x_in;
+			magy: port mag_sens.mag_y -> aocs_cpu.mag_y_in;
+			magz: port mag_sens.mag_z -> aocs_cpu.mag_z_in;
+			mag_active: port aocs_cpu.mag_activate_out -> mag_sens.mag_activate;
+			
+			ratex: port gyro_sens.rate_x -> aocs_cpu.rate_x_in;
+			ratey: port gyro_sens.rate_y -> aocs_cpu.rate_y_in;
+			ratez: port gyro_sens.rate_z -> aocs_cpu.rate_z_in;
+			gyro_active: port aocs_cpu.rate_activate_out -> gyro_sens.rate_activate;
+			
+			st_x: port st_sens.st_rot_x -> aocs_cpu.st_rot_x_in;
+			st_y: port st_sens.st_rot_y -> aocs_cpu.st_rot_y_in;
+			st_z: port st_sens.st_rot_z -> aocs_cpu.st_rot_z_in;
+			st_active: port aocs_cpu.st_activate_out -> st_sens.st_activate;
+			
+			gps_long_con: port gps_sens.long -> aocs_cpu.gps_long_in;
+			gps_lat_con: port gps_sens.lat -> aocs_cpu.gps_lat_in;
+			gps_el_con: port gps_sens.el -> aocs_cpu.gps_el_in;
+			gps_time_con: port gps_sens.time -> aocs_cpu.gps_time_in;
+			gps_active: port aocs_cpu.gps_activate_out -> gps_sens.gps_activate;
+			
+			-- actuator connections to cpu
+			tor_x_con: port aocs_cpu.tor_x_out -> inertia_wheel.tor_x;
+			tor_y_con: port aocs_cpu.tor_y_out -> inertia_wheel.tor_y;
+			tor_z_con: port aocs_cpu.tor_z_out -> inertia_wheel.tor_z;
+			
+			dV_x_con: port aocs_cpu.dV_x_out -> thruster.dV_x;
+			dV_y_con: port aocs_cpu.dV_y_out -> thruster.dV_y;
+			dV_z_con: port aocs_cpu.dV_z_out -> thruster.dV_z;
+			
+			
+			
+			--  ///////////////// SENSOR-DEVICE CONNECTIONS FOR RDUNDANT SYSTEM \\\\\\\\\\
+			-- sensor connections to cpu (sens data + activation signal)
+			fss_x_r: port fss_sens_r.fss_rot_x -> aocs_cpu_r.fss_rot_x_in;
+			fss_y_r: port fss_sens_r.fss_rot_y -> aocs_cpu_r.fss_rot_y_in;
+			fss_z_r: port fss_sens_r.fss_rot_z -> aocs_cpu_r.fss_rot_z_in;
+			fss_active_r: port aocs_cpu_r.fss_activate_out -> fss_sens_r.fss_activate;
+			
+			css_x_r: port css_sens_r.css_rot_x -> aocs_cpu_r.css_rot_x_in;
+			css_y_r: port css_sens_r.css_rot_y -> aocs_cpu_r.css_rot_y_in;
+			css_z_r: port css_sens_r.css_rot_z -> aocs_cpu_r.css_rot_z_in;
+			css_active_r: port aocs_cpu_r.css_activate_out -> css_sens_r.css_activate;
+			
+			sps_r: port sps_sens_r.is_present -> aocs_cpu_r.sps_present_in;
+			sps_active_r: port aocs_cpu_r.sps_activate_out -> sps_sens_r.sps_activate;
+			
+			es_x_r: port es_sens_r.es_rot_x -> aocs_cpu_r.es_rot_x_in;
+			es_y_r: port es_sens_r.es_rot_y -> aocs_cpu_r.es_rot_y_in;
+			es_z_r: port es_sens_r.es_rot_z -> aocs_cpu_r.es_rot_z_in;
+			es_active_r: port aocs_cpu_r.es_activate_out -> es_sens_r.es_activate;
+			
+			magx_r: port mag_sens_r.mag_x -> aocs_cpu_r.mag_x_in;
+			magy_r: port mag_sens_r.mag_y -> aocs_cpu_r.mag_y_in;
+			magz_r: port mag_sens_r.mag_z -> aocs_cpu_r.mag_z_in;
+			mag_active_r: port aocs_cpu_r.mag_activate_out -> mag_sens_r.mag_activate;
+			
+			ratex_r: port gyro_sens_r.rate_x -> aocs_cpu_r.rate_x_in;
+			ratey_r: port gyro_sens_r.rate_y -> aocs_cpu_r.rate_y_in;
+			ratez_r: port gyro_sens_r.rate_z -> aocs_cpu_r.rate_z_in;
+			gyro_active_r: port aocs_cpu_r.rate_activate_out -> gyro_sens_r.rate_activate;
+			
+			st_x_r: port st_sens_r.st_rot_x -> aocs_cpu_r.st_rot_x_in;
+			st_y_r: port st_sens_r.st_rot_y -> aocs_cpu_r.st_rot_y_in;
+			st_z_r: port st_sens_r.st_rot_z -> aocs_cpu_r.st_rot_z_in;
+			st_active_r: port aocs_cpu_r.st_activate_out -> st_sens_r.st_activate;
+			
+			gps_long_con_r: port gps_sens_r.long -> aocs_cpu_r.gps_long_in;
+			gps_lat_con_r: port gps_sens_r.lat -> aocs_cpu_r.gps_lat_in;
+			gps_el_con_r: port gps_sens_r.el -> aocs_cpu_r.gps_el_in;
+			gps_time_con_r: port gps_sens_r.time -> aocs_cpu_r.gps_time_in;
+			gps_active_r: port aocs_cpu_r.gps_activate_out -> gps_sens_r.gps_activate;
+			
+			-- actuator connections to redundant cpu (redundant computer to same actuators)
+			tor_x_con_r: port aocs_cpu_r.tor_x_out -> inertia_wheel.tor_x;
+			tor_y_con_r: port aocs_cpu_r.tor_y_out -> inertia_wheel.tor_y;
+			tor_z_con_r: port aocs_cpu_r.tor_z_out -> inertia_wheel.tor_z;
+			
+			dV_x_con_r: port aocs_cpu_r.dV_x_out -> thruster.dV_x;
+			dV_y_con_r: port aocs_cpu_r.dV_y_out -> thruster.dV_y;
+			dV_z_con_r: port aocs_cpu_r.dV_z_out -> thruster.dV_z;
+			
+			
+			
+			
+			
+			-- aocs_cpu <-> obdh_cpu connection (main)
+			obdh_aocs_act: port obdh_cpu.activation_out -> aocs_cpu.activate_in;
+			obdh_aocs_telem: port aocs_cpu.telemetry_out -> obdh_cpu.telemetry_in;
+			obdh_aocs_telec: port obdh_cpu.telecommand_out -> aocs_cpu.telecommand_in;
+			
+			-- aocs_cpu <-> obdh_cpu connection (redundant)
+			obdh_aocs_act_r: port obdh_cpu.activation_out -> aocs_cpu_r.activate_in;
+			obdh_aocs_telem_r: port aocs_cpu_r.telemetry_out -> obdh_cpu.telemetry_in;
+			obdh_aocs_telec_r: port obdh_cpu.telecommand_out -> aocs_cpu_r.telecommand_in;
+			
+			-- watchdog connections (main)
+			aocs_watch: port aocs_cpu.to_watchdog_out -> watchdog_module.watchdog_acos_main_in;
+			watch_aocs: port watchdog_module.watchdog_response_main_out -> aocs_cpu.activate_in;
+			
+			-- watchdog connections (redundant)
+			aocs_watch_r: port aocs_cpu_r.to_watchdog_out -> watchdog_module.watchdog_acos_main_in;
+			watch_aocs_r: port watchdog_module.watchdog_response_main_out -> aocs_cpu_r.activate_in;
+			
+			
+			
+			
+			-- processes connections (the nasty part?)
+			
+			--------------------------------- attitudeController process
+			-- 1) from aocs_cpu to process
+			cpu_fss_x: port aocs_cpu.fss_rot_x_out -> attitude_cont.fss_rot_x;
+			cpu_fss_y: port aocs_cpu.fss_rot_y_out -> attitude_cont.fss_rot_y;
+			cpu_fss_z: port aocs_cpu.fss_rot_z_out -> attitude_cont.fss_rot_z;
+			
+			cpu_css_x: port aocs_cpu.css_rot_x_out -> attitude_cont.css_rot_x;
+			cpu_css_y: port aocs_cpu.css_rot_y_out -> attitude_cont.css_rot_y;
+			cpu_css_z: port aocs_cpu.css_rot_z_out -> attitude_cont.css_rot_z;
+			
+			cpu_sps: port aocs_cpu.sps_present_out -> attitude_cont.sps_present;
+			
+			cpu_es_x: port aocs_cpu.es_rot_x_out -> attitude_cont.es_rot_x;
+			cpu_es_y: port aocs_cpu.es_rot_y_out -> attitude_cont.es_rot_y;
+			cpu_es_z: port aocs_cpu.es_rot_z_out -> attitude_cont.es_rot_z;
+			
+			cpu_mag_x: port aocs_cpu.mag_x_out -> attitude_cont.mag_x;
+			cpu_mag_y: port aocs_cpu.mag_y_out -> attitude_cont.mag_y;
+			cpu_mag_z: port aocs_cpu.mag_z_out -> attitude_cont.mag_z;
+			
+			cpu_gyro_x: port aocs_cpu.rate_x_out -> attitude_cont.rate_x;
+			cpu_gyro_y: port aocs_cpu.rate_y_out -> attitude_cont.rate_y;
+			cpu_gyro_z: port aocs_cpu.rate_z_out -> attitude_cont.rate_z;
+			
+			cpu_st_x: port aocs_cpu.st_rot_x_out -> attitude_cont.st_rot_x;
+			cpu_st_y: port aocs_cpu.st_rot_y_out -> attitude_cont.st_rot_y;
+			cpu_st_z: port aocs_cpu.st_rot_z_out -> attitude_cont.st_rot_z;
+			
+			cpu_telecommand_att: port aocs_cpu.telecommand_out -> attitude_cont.telecommand;
+			
+			-- 2) output from process to computer
+			att_cpu_tor_x: port attitude_cont.tor_x -> aocs_cpu.tor_x_in;
+			att_cpu_tor_y: port attitude_cont.tor_x -> aocs_cpu.tor_y_in; 
+			att_cpu_tor_z: port attitude_cont.tor_x -> aocs_cpu.tor_z_in; 
+			 
+			 
+			-- --------------------------------orbitController process
+			-- 1) from cpu to process
+			cpu_gps_long: port aocs_cpu.gps_long_out -> orbit_cont.gps_long;
+			cpu_gps_lat: port aocs_cpu.gps_lat_out -> orbit_cont.gps_lat;
+			cpu_gps_el: port aocs_cpu.gps_el_out -> orbit_cont.gps_el;
+			cpu_gps_time: port aocs_cpu.gps_time_out -> orbit_cont.gps_time;
+			
+			cpu_st_x_orb: port aocs_cpu.st_rot_x_out -> orbit_cont.st_rot_x;
+			cpu_st_y_orb: port aocs_cpu.st_rot_y_out -> orbit_cont.st_rot_y;
+			cpu_st_z_orb: port aocs_cpu.st_rot_z_out -> orbit_cont.st_rot_z;
+			
+			cpu_telecommand_orb: port aocs_cpu.telecommand_out -> orbit_cont.telecommand;
+			
+			-- 2) output from process to cpu
+			orb_cpu_dV_x: port orbit_cont.dV_x -> aocs_cpu.dV_x_in;
+			orb_cpu_dV_y: port orbit_cont.dV_y -> aocs_cpu.dV_y_in;
+			orb_cpu_dV_z: port orbit_cont.dV_z -> aocs_cpu.dV_z_in;
+			
+			
+			
+			
+			----------------------------- AocsReconfiguration process
+			-- 1) from aocs_cpu to process
+			cpu_fss_x_reconfig: port aocs_cpu.fss_rot_x_out -> aocs_reconfig.fss_rot_x;
+			cpu_fss_y_reconfig: port aocs_cpu.fss_rot_y_out -> aocs_reconfig.fss_rot_y;
+			cpu_fss_z_reconfig: port aocs_cpu.fss_rot_z_out -> aocs_reconfig.fss_rot_z;
+			
+			cpu_css_x_reconfig: port aocs_cpu.css_rot_x_out -> aocs_reconfig.css_rot_x;
+			cpu_css_y_reconfig: port aocs_cpu.css_rot_y_out -> aocs_reconfig.css_rot_y;
+			cpu_css_z_reconfig: port aocs_cpu.css_rot_z_out -> aocs_reconfig.css_rot_z;
+			
+			cpu_sps_reconfig: port aocs_cpu.sps_present_out -> aocs_reconfig.sps_present;
+			
+			cpu_es_x_reconfig: port aocs_cpu.es_rot_x_out -> aocs_reconfig.es_rot_x;
+			cpu_es_y_reconfig: port aocs_cpu.es_rot_y_out -> aocs_reconfig.es_rot_y;
+			cpu_es_z_reconfig: port aocs_cpu.es_rot_z_out -> aocs_reconfig.es_rot_z;
+			
+			cpu_mag_x_reconfig: port aocs_cpu.mag_x_out -> aocs_reconfig.mag_x;
+			cpu_mag_y_reconfig: port aocs_cpu.mag_y_out -> aocs_reconfig.mag_y;
+			cpu_mag_z_reconfig: port aocs_cpu.mag_z_out -> aocs_reconfig.mag_z;
+			
+			cpu_gyro_x_reconfig: port aocs_cpu.rate_x_out -> aocs_reconfig.rate_x;
+			cpu_gyro_y_reconfig: port aocs_cpu.rate_y_out -> aocs_reconfig.rate_y;
+			cpu_gyro_z_reconfig: port aocs_cpu.rate_z_out -> aocs_reconfig.rate_z;
+			
+			cpu_st_x_reconfig: port aocs_cpu.st_rot_x_out -> aocs_reconfig.st_rot_x;
+			cpu_st_y_reconfig: port aocs_cpu.st_rot_y_out -> aocs_reconfig.st_rot_y;
+			cpu_st_z_reconfig: port aocs_cpu.st_rot_z_out -> aocs_reconfig.st_rot_z;
+			
+			cpu_gps_long_reconfig: port aocs_cpu.gps_long_out -> aocs_reconfig.gps_long;
+			cpu_gps_lat_reconfig: port aocs_cpu.gps_lat_out -> aocs_reconfig.gps_lat;
+			cpu_gps_el_reconfig: port aocs_cpu.gps_el_out -> aocs_reconfig.gps_el;
+			cpu_gps_time_reconfig: port aocs_cpu.gps_time_out -> aocs_reconfig.gps_time;
+			
+			cpu_telecommand_reconfig: port aocs_cpu.telecommand_out -> aocs_reconfig.telecommand;
+			cpu_active_reconfig: port aocs_cpu.activate_out -> aocs_reconfig.activate;
+			
+			-- 2) output from process to cpu
+			fss_active_reconfig: port aocs_reconfig.fss_activate -> aocs_cpu.fss_activate_in;
+			css_active_reconfig: port aocs_reconfig.css_activate -> aocs_cpu.css_activate_in;
+			sps_active_reconfig: port aocs_reconfig.sps_activate -> aocs_cpu.sps_activate_in;
+			es_active_reconfig: port aocs_reconfig.es_activate -> aocs_cpu.es_activate_in;
+			mag_active_reconfig: port aocs_reconfig.mag_activate -> aocs_cpu.mag_activate_in;
+			rate_active_reconfig: port aocs_reconfig.rate_activate -> aocs_cpu.rate_activate_in;
+			st_active_reconfig: port aocs_reconfig.st_activate -> aocs_cpu.st_activate_in;
+			gps_active_reconfig: port aocs_reconfig.gps_activate -> aocs_cpu.gps_activate_in;
+			
+			
+			
+			----------------------------- sendTelemetry process
+			-- 1) from aocs_cpu to process
+			cpu_fss_x_telem: port aocs_cpu.fss_rot_x_out -> send_telem.fss_rot_x;
+			cpu_fss_y_telem: port aocs_cpu.fss_rot_y_out -> send_telem.fss_rot_y;
+			cpu_fss_z_telem: port aocs_cpu.fss_rot_z_out -> send_telem.fss_rot_z;
+			
+			cpu_css_x_telem: port aocs_cpu.css_rot_x_out -> send_telem.css_rot_x;
+			cpu_css_y_telem: port aocs_cpu.css_rot_y_out -> send_telem.css_rot_y;
+			cpu_css_z_telem: port aocs_cpu.css_rot_z_out -> send_telem.css_rot_z;
+			
+			cpu_sps_telem: port aocs_cpu.sps_present_out -> send_telem.sps_present;
+			
+			cpu_es_x_telem: port aocs_cpu.es_rot_x_out -> send_telem.es_rot_x;
+			cpu_es_y_telem: port aocs_cpu.es_rot_y_out -> send_telem.es_rot_y;
+			cpu_es_z_telem: port aocs_cpu.es_rot_z_out -> send_telem.es_rot_z;
+			
+			cpu_mag_x_telem: port aocs_cpu.mag_x_out -> send_telem.mag_x;
+			cpu_mag_y_telem: port aocs_cpu.mag_y_out -> send_telem.mag_y;
+			cpu_mag_z_telem: port aocs_cpu.mag_z_out -> send_telem.mag_z;
+			
+			cpu_gyro_x_telem: port aocs_cpu.rate_x_out -> send_telem.rate_x;
+			cpu_gyro_y_telem: port aocs_cpu.rate_y_out -> send_telem.rate_y;
+			cpu_gyro_z_telem: port aocs_cpu.rate_z_out -> send_telem.rate_z;
+			
+			cpu_st_x_telem: port aocs_cpu.st_rot_x_out -> send_telem.st_rot_x;
+			cpu_st_y_telem: port aocs_cpu.st_rot_y_out -> send_telem.st_rot_y;
+			cpu_st_z_telem: port aocs_cpu.st_rot_z_out -> send_telem.st_rot_z;
+			
+			cpu_gps_long_telem: port aocs_cpu.gps_long_out -> send_telem.gps_long;
+			cpu_gps_lat_telem: port aocs_cpu.gps_lat_out -> send_telem.gps_lat;
+			cpu_gps_el_telem: port aocs_cpu.gps_el_out -> send_telem.gps_el;
+			cpu_gps_time_telem: port aocs_cpu.gps_time_out -> send_telem.gps_time;
+			
+			--2) sending output from the process to cpu
+			telem_msg_out: port send_telem.telemtryMessage -> aocs_cpu.telemetry_in;
+			
+			
+			
+			------------------------- watchdogEvent process
+			wde_aocs: port watchdog_event.to_watchdog -> aocs_cpu.to_watchdog_in;	
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			-- /////////////////processes connections (for the redundant system) \\\\\\\\\\\\\\
+			
+			---------------------Redundant attitudeController process
+			-- 1) from aocs_cpu to process
+			cpu_fss_x_r: port aocs_cpu_r.fss_rot_x_out -> attitude_cont_r.fss_rot_x;
+			cpu_fss_y_r: port aocs_cpu_r.fss_rot_y_out -> attitude_cont_r.fss_rot_y;
+			cpu_fss_z_r: port aocs_cpu_r.fss_rot_z_out -> attitude_cont_r.fss_rot_z;
+			
+			cpu_css_x_r: port aocs_cpu_r.css_rot_x_out -> attitude_cont_r.css_rot_x;
+			cpu_css_y_r: port aocs_cpu_r.css_rot_y_out -> attitude_cont_r.css_rot_y;
+			cpu_css_z_r: port aocs_cpu_r.css_rot_z_out -> attitude_cont_r.css_rot_z;
+			
+			cpu_sps_r: port aocs_cpu_r.sps_present_out -> attitude_cont_r.sps_present;
+			
+			cpu_es_x_r: port aocs_cpu_r.es_rot_x_out -> attitude_cont_r.es_rot_x;
+			cpu_es_y_r: port aocs_cpu_r.es_rot_y_out -> attitude_cont_r.es_rot_y;
+			cpu_es_z_r: port aocs_cpu_r.es_rot_z_out -> attitude_cont_r.es_rot_z;
+			
+			cpu_mag_x_r: port aocs_cpu_r.mag_x_out -> attitude_cont_r.mag_x;
+			cpu_mag_y_r: port aocs_cpu_r.mag_y_out -> attitude_cont_r.mag_y;
+			cpu_mag_z_r: port aocs_cpu_r.mag_z_out -> attitude_cont_r.mag_z;
+			
+			cpu_gyro_x_r: port aocs_cpu_r.rate_x_out -> attitude_cont_r.rate_x;
+			cpu_gyro_y_r: port aocs_cpu_r.rate_y_out -> attitude_cont_r.rate_y;
+			cpu_gyro_z_r: port aocs_cpu_r.rate_z_out -> attitude_cont_r.rate_z;
+			
+			cpu_st_x_r: port aocs_cpu_r.st_rot_x_out -> attitude_cont_r.st_rot_x;
+			cpu_st_y_r: port aocs_cpu_r.st_rot_y_out -> attitude_cont_r.st_rot_y;
+			cpu_st_z_r: port aocs_cpu_r.st_rot_z_out -> attitude_cont_r.st_rot_z;
+			
+			cpu_telecommand_att_r: port aocs_cpu_r.telecommand_out -> attitude_cont_r.telecommand;
+			
+			-- 2) output from process to computer
+			att_cpu_tor_x_r: port attitude_cont_r.tor_x -> aocs_cpu_r.tor_x_in;
+			att_cpu_tor_y_r: port attitude_cont_r.tor_x -> aocs_cpu_r.tor_y_in; 
+			att_cpu_tor_z_r: port attitude_cont_r.tor_x -> aocs_cpu_r.tor_z_in; 
+			 
+			 
+			-- -----------------Redundant orbitController process
+			-- 1) from cpu to process
+			cpu_gps_long_r: port aocs_cpu_r.gps_long_out -> orbit_cont_r.gps_long;
+			cpu_gps_lat_r: port aocs_cpu_r.gps_lat_out -> orbit_cont_r.gps_lat;
+			cpu_gps_el_r: port aocs_cpu_r.gps_el_out -> orbit_cont_r.gps_el;
+			cpu_gps_time_r: port aocs_cpu_r.gps_time_out -> orbit_cont_r.gps_time;
+			
+			cpu_st_x_orb_r: port aocs_cpu_r.st_rot_x_out -> orbit_cont_r.st_rot_x;
+			cpu_st_y_orb_r: port aocs_cpu_r.st_rot_y_out -> orbit_cont_r.st_rot_y;
+			cpu_st_z_orb_r: port aocs_cpu_r.st_rot_z_out -> orbit_cont_r.st_rot_z;
+			
+			cpu_telecommand_orb_r: port aocs_cpu_r.telecommand_out -> orbit_cont_r.telecommand;
+			
+			-- 2) output from process to cpu
+			orb_cpu_dV_x_r: port orbit_cont_r.dV_x -> aocs_cpu_r.dV_x_in;
+			orb_cpu_dV_y_r: port orbit_cont_r.dV_y -> aocs_cpu_r.dV_y_in;
+			orb_cpu_dV_z_r: port orbit_cont_r.dV_z -> aocs_cpu_r.dV_z_in;
+			
+			
+			
+			
+			----------------------------- AocsReconfiguration process
+			-- 1) from aocs_cpu to process
+			cpu_fss_x_reconfig_r: port aocs_cpu_r.fss_rot_x_out -> aocs_reconfig_r.fss_rot_x;
+			cpu_fss_y_reconfig_r: port aocs_cpu_r.fss_rot_y_out -> aocs_reconfig_r.fss_rot_y;
+			cpu_fss_z_reconfig_r: port aocs_cpu_r.fss_rot_z_out -> aocs_reconfig_r.fss_rot_z;
+			
+			cpu_css_x_reconfig_r: port aocs_cpu_r.css_rot_x_out -> aocs_reconfig_r.css_rot_x;
+			cpu_css_y_reconfig_r: port aocs_cpu_r.css_rot_y_out -> aocs_reconfig_r.css_rot_y;
+			cpu_css_z_reconfig_r: port aocs_cpu_r.css_rot_z_out -> aocs_reconfig_r.css_rot_z;
+			
+			cpu_sps_reconfig_r: port aocs_cpu_r.sps_present_out -> aocs_reconfig_r.sps_present;
+			
+			cpu_es_x_reconfig_r: port aocs_cpu_r.es_rot_x_out -> aocs_reconfig_r.es_rot_x;
+			cpu_es_y_reconfig_r: port aocs_cpu_r.es_rot_y_out -> aocs_reconfig_r.es_rot_y;
+			cpu_es_z_reconfig_r: port aocs_cpu_r.es_rot_z_out -> aocs_reconfig_r.es_rot_z;
+			
+			cpu_mag_x_reconfig_r: port aocs_cpu_r.mag_x_out -> aocs_reconfig_r.mag_x;
+			cpu_mag_y_reconfig_r: port aocs_cpu_r.mag_y_out -> aocs_reconfig_r.mag_y;
+			cpu_mag_z_reconfig_r: port aocs_cpu_r.mag_z_out -> aocs_reconfig_r.mag_z;
+			
+			cpu_gyro_x_reconfig_r: port aocs_cpu_r.rate_x_out -> aocs_reconfig_r.rate_x;
+			cpu_gyro_y_reconfig_r: port aocs_cpu_r.rate_y_out -> aocs_reconfig_r.rate_y;
+			cpu_gyro_z_reconfig_r: port aocs_cpu_r.rate_z_out -> aocs_reconfig_r.rate_z;
+			
+			cpu_st_x_reconfig_r: port aocs_cpu_r.st_rot_x_out -> aocs_reconfig_r.st_rot_x;
+			cpu_st_y_reconfig_r: port aocs_cpu_r.st_rot_y_out -> aocs_reconfig_r.st_rot_y;
+			cpu_st_z_reconfig_r: port aocs_cpu_r.st_rot_z_out -> aocs_reconfig_r.st_rot_z;
+			
+			cpu_gps_long_reconfig_r: port aocs_cpu_r.gps_long_out -> aocs_reconfig_r.gps_long;
+			cpu_gps_lat_reconfig_r: port aocs_cpu_r.gps_lat_out -> aocs_reconfig_r.gps_lat;
+			cpu_gps_el_reconfig_r: port aocs_cpu_r.gps_el_out -> aocs_reconfig_r.gps_el;
+			cpu_gps_time_reconfig_r: port aocs_cpu_r.gps_time_out -> aocs_reconfig_r.gps_time;
+			
+			cpu_telecommand_reconfig_r: port aocs_cpu_r.telecommand_out -> aocs_reconfig_r.telecommand;
+			cpu_active_reconfig_r: port aocs_cpu_r.activate_out -> aocs_reconfig_r.activate;
+			
+			-- 2) output from process to cpu
+			fss_active_reconfig_r: port aocs_reconfig_r.fss_activate -> aocs_cpu_r.fss_activate_in;
+			css_active_reconfig_r: port aocs_reconfig_r.css_activate -> aocs_cpu_r.css_activate_in;
+			sps_active_reconfig_r: port aocs_reconfig_r.sps_activate -> aocs_cpu_r.sps_activate_in;
+			es_active_reconfig_r: port aocs_reconfig_r.es_activate -> aocs_cpu_r.es_activate_in;
+			mag_active_reconfig_r: port aocs_reconfig_r.mag_activate -> aocs_cpu_r.mag_activate_in;
+			rate_active_reconfig_r: port aocs_reconfig_r.rate_activate -> aocs_cpu_r.rate_activate_in;
+			st_active_reconfig_r: port aocs_reconfig_r.st_activate -> aocs_cpu_r.st_activate_in;
+			gps_active_reconfig_r: port aocs_reconfig_r.gps_activate -> aocs_cpu_r.gps_activate_in;
+			
+			
+			
+			----------------------------- sendTelemetry process
+			-- 1) from aocs_cpu to process
+			cpu_fss_x_telem_r: port aocs_cpu_r.fss_rot_x_out -> send_telem_r.fss_rot_x;
+			cpu_fss_y_telem_r: port aocs_cpu_r.fss_rot_y_out -> send_telem_r.fss_rot_y;
+			cpu_fss_z_telem_r: port aocs_cpu_r.fss_rot_z_out -> send_telem_r.fss_rot_z;
+			
+			cpu_css_x_telem_r: port aocs_cpu_r.css_rot_x_out -> send_telem_r.css_rot_x;
+			cpu_css_y_telem_r: port aocs_cpu_r.css_rot_y_out -> send_telem_r.css_rot_y;
+			cpu_css_z_telem_r: port aocs_cpu_r.css_rot_z_out -> send_telem_r.css_rot_z;
+			
+			cpu_sps_telem_r: port aocs_cpu_r.sps_present_out -> send_telem_r.sps_present;
+			
+			cpu_es_x_telem_r: port aocs_cpu_r.es_rot_x_out -> send_telem_r.es_rot_x;
+			cpu_es_y_telem_r: port aocs_cpu_r.es_rot_y_out -> send_telem_r.es_rot_y;
+			cpu_es_z_telem_r: port aocs_cpu_r.es_rot_z_out -> send_telem_r.es_rot_z;
+			
+			cpu_mag_x_telem_r: port aocs_cpu_r.mag_x_out -> send_telem_r.mag_x;
+			cpu_mag_y_telem_r: port aocs_cpu_r.mag_y_out -> send_telem_r.mag_y;
+			cpu_mag_z_telem_r: port aocs_cpu_r.mag_z_out -> send_telem_r.mag_z;
+			
+			cpu_gyro_x_telem_r: port aocs_cpu_r.rate_x_out -> send_telem_r.rate_x;
+			cpu_gyro_y_telem_r: port aocs_cpu_r.rate_y_out -> send_telem_r.rate_y;
+			cpu_gyro_z_telem_r: port aocs_cpu_r.rate_z_out -> send_telem_r.rate_z;
+			
+			cpu_st_x_telem_r: port aocs_cpu_r.st_rot_x_out -> send_telem_r.st_rot_x;
+			cpu_st_y_telem_r: port aocs_cpu_r.st_rot_y_out -> send_telem_r.st_rot_y;
+			cpu_st_z_telem_r: port aocs_cpu_r.st_rot_z_out -> send_telem_r.st_rot_z;
+			
+			cpu_gps_long_telem_r: port aocs_cpu_r.gps_long_out -> send_telem_r.gps_long;
+			cpu_gps_lat_telem_r: port aocs_cpu_r.gps_lat_out -> send_telem_r.gps_lat;
+			cpu_gps_el_telem_r: port aocs_cpu_r.gps_el_out -> send_telem_r.gps_el;
+			cpu_gps_time_telem_r: port aocs_cpu_r.gps_time_out -> send_telem_r.gps_time;
+			
+			--2) sending output from the process to cpu
+			telem_msg_out_r: port send_telem_r.telemtryMessage -> aocs_cpu_r.telemetry_in;
+			
+			
+			
+			------------------------- watchdogEvent process
+			wde_aocs_r: port watchdog_event_r.to_watchdog -> aocs_cpu_r.to_watchdog_in;		
+			
+	end Satellite.impl;
+	
+	
+	--------- DEVICE IMPLEMENTATIONS: SENSOR IMPLEMENTATION ---------------------
+
+	device implementation FineSunSensor.impl
+		properties
+			Period => 100ms;
+	end FineSunSensor.impl;
+	device implementation CoarseSunSensor.impl
+		properties
+			Period => 100ms;
+	end CoarseSunSensor.impl;
+	device implementation SunPresenceSensor.impl
+		properties
+			Period => 1000ms;
+	end SunPresenceSensor.impl;
+	device implementation EarthSensor.impl
+		properties
+			Period => 1000ms;
+	end EarthSensor.impl;
+	device implementation Magnetometer.impl
+		properties
+			Period => 10ms;
+	end Magnetometer.impl;
+	device implementation Gyroscope.impl
+		properties
+			Period => 1ms;
+	end Gyroscope.impl;
+	device implementation GPS.impl
+		properties
+			Period => 1000ms;
+	end GPS.impl;
+	device implementation StarTracker.impl
+		properties
+			Period => 1000ms;
+	end StarTracker.impl;
+end lab3;

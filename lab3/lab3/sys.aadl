@@ -179,11 +179,11 @@ public
 			
 			-- watchdog connections (main)
 			aocs_watch: port aocs_cpu.to_watchdog_out -> watchdog_module.watchdog_acos_main_in;
-			watch_aocs: port watchdog_module.watchdog_response_main_out -> aocs_cpu.activate_in;
-			
+			watch_aocs: port watchdog_module.watchdog_response_main_out -> aocs_cpu.from_watchdog_in;
+
 			-- watchdog connections (redundant)
-			aocs_watch_r: port aocs_cpu_r.to_watchdog_out -> watchdog_module.watchdog_acos_main_in;
-			watch_aocs_r: port watchdog_module.watchdog_response_main_out -> aocs_cpu_r.activate_in;
+			aocs_watch_r: port aocs_cpu_r.to_watchdog_out -> watchdog_module.watchdog_acos_red_in;
+			watch_aocs_r: port watchdog_module.watchdog_response_red_out -> aocs_cpu_r.from_watchdog_in;
 			
 			
 			
@@ -248,6 +248,8 @@ public
 			
 			cpu_telecommand_reconfig: port aocs_cpu.telecommand_out -> aocs_reconfig.telecommand;
 			cpu_active_reconfig: port aocs_cpu.activate_out -> aocs_reconfig.activate;
+			
+			cpu_wd_reconfig: port aocs_cpu.from_watchdog_out -> aocs_reconfig.from_watchdog;
 			
 			-- 2) output from process to cpu
 			fss_active_reconfig: port aocs_reconfig.fss_activate -> aocs_cpu.fss_activate_in;
@@ -356,6 +358,8 @@ public
 			
 			cpu_telecommand_reconfig_r: port aocs_cpu_r.telecommand_out -> aocs_reconfig_r.telecommand;
 			cpu_active_reconfig_r: port aocs_cpu_r.activate_out -> aocs_reconfig_r.activate;
+			
+			cpu_wd_reconfig_r: port aocs_cpu_r.from_watchdog_out -> aocs_reconfig_r.from_watchdog;
 			
 			-- 2) output from process to cpu
 			fss_active_reconfig_r: port aocs_reconfig_r.fss_activate -> aocs_cpu_r.fss_activate_in;

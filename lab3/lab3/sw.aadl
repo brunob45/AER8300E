@@ -158,6 +158,8 @@ public
 			telecommand: in data port lab3::types::telecommandString;
 			activate: in data port lab3::types::aocsActivate;
 			
+			from_watchdog: in data port lab3::types::watchdogResponse;
+						
 			-- outputs of the process
 			fss_activate: out data port lab3::types::deviceActivate;
 			css_activate: out data port lab3::types::deviceActivate;
@@ -193,6 +195,8 @@ public
 			
 			telecommand: in data port lab3::types::telecommandString;
 			activate: in data port lab3::types::aocsActivate;
+			
+			from_watchdog: in data port lab3::types::watchdogResponse;
 			
 			-- outputs of the thread
 			fss_activate: out data port lab3::types::deviceActivate;
@@ -236,6 +240,8 @@ public
 	
 			telecommand_con: port telecommand -> worker.telecommand;
 			activate_cond: port activate -> worker.activate;
+			
+			from_wd: port from_watchdog -> worker.from_watchdog;
 			
 			-- outputs connections
 			fss_act: port worker.fss_activate -> fss_activate;
